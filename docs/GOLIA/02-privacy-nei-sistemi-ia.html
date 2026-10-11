@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protezione della privacy nei sistemi IA</title>
+<link rel="stylesheet" href="stile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="corso" href="index.html">Indice del corso</a>
+    <span class="posizione">Modulo 2 di 5</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Protezione della privacy nei sistemi IA</h1>
+  <p class="sottotitolo">Che cosa si può scrivere in un chatbot e che cosa no.</p>
+
+  <h2>Due casi da conoscere</h2>
+  <div class="griglia">
+    <article class="card">
+      <h3>Il Garante italiano e ChatGPT (2023)</h3>
+      <p>Nel marzo 2023 il Garante per la protezione dei dati personali ha limitato temporaneamente ChatGPT in Italia, contestando tra l'altro la mancanza di una base giuridica chiara per l'uso dei dati e di una verifica dell'età. Il servizio è tornato disponibile dopo alcune modifiche.</p>
+      <p class="piccolo">Il punto: anche in Europa i sistemi di IA devono rispettare il GDPR.</p>
+    </article>
+    <article class="card">
+      <h3>Il codice incollato nel chatbot (Samsung, 2023)</h3>
+      <p>Secondo le notizie dell'epoca, alcuni dipendenti di Samsung hanno incollato in un chatbot pubblico codice e appunti riservati dell'azienda. L'azienda ha poi limitato l'uso di questi strumenti.</p>
+      <p class="piccolo">Il punto: ciò che scrivi esce dal tuo dispositivo e può essere conservato.</p>
+    </article>
+  </div>
+
+  <div class="nota attenzione">
+    <p><strong>La regola della cartolina.</strong> Non scrivere in un chatbot pubblico nulla che non scriveresti su una cartolina: chiunque potrebbe leggerla, e non puoi riprenderla indietro.</p>
+  </div>
+
+  <h2>Esercizio: posso incollarlo?</h2>
+  <p>Per ogni testo scegli una risposta. Poi leggi la spiegazione. Tutti i testi sono di esempio.</p>
+  <p class="punteggio" id="punteggio" aria-live="polite">Risposte corrette: 0 su 10</p>
+  <div class="pila" id="casi"></div>
+
+  <h2>Impostazioni da controllare in un chatbot</h2>
+  <p>Ogni servizio ha un menu diverso, ma di solito trovi queste opzioni in <em>Impostazioni</em> o <em>Privacy</em>:</p>
+  <ul>
+    <li>L'opzione che permette di usare le tue conversazioni per migliorare il modello (spesso attiva in modo predefinito).</li>
+    <li>La cronologia delle conversazioni, con la possibilità di eliminarla.</li>
+    <li>La modalità temporanea o "chat senza cronologia", dove disponibile.</li>
+    <li>L'eliminazione dell'account e dei dati collegati.</li>
+  </ul>
+  <p class="piccolo">I nomi e i percorsi dei menu cambiano spesso. Verifica sul servizio che userai, poco prima della lezione.</p>
+
+  <h2>Tre abitudini utili</h2>
+  <ol class="passi">
+    <li>Prima di incollare un testo, sostituisci nomi, numeri e indirizzi con segnaposto come [NOME] o [CITTÀ]. Nel modulo 5 trovi uno strumento che aiuta a farlo.</li>
+    <li>Non caricare documenti di identità, referti o contratti interi.</li>
+    <li>Se lavori per un'azienda, leggi le regole interne sull'uso dell'IA prima di usare strumenti pubblici.</li>
+  </ol>
+
+  <nav class="sfoglia" aria-label="Moduli">
+    <a href="01-dati-raccolti.html">Modulo 1: Dati raccolti</a>
+    <a href="03-targetizzazione.html">Modulo 3: Targetizzazione</a>
+  </nav>
+</main>
+
+<footer class="sito"><div class="wrap">I casi citati sono riportati in sintesi: per i dettagli consulta le fonti ufficiali e giornalistiche.</div></footer>
+
+<script>
+var CASI = [
+  { t: "Spiegami in parole semplici che cos'è il GDPR.", r: 'si',
+    p: "Domanda generale, senza dati di nessuno." },
+  { t: "Riscrivi questa email: \"Gentile Mario Rossi, il bonifico va fatto sul conto IT60X0542811101000000123456\".", r: 'no',
+    p: "Contiene un nome e un IBAN. Si può chiedere aiuto per lo stile usando segnaposto: [NOME] e [IBAN]." },
+  { t: "Il codice sorgente del programma gestionale della mia azienda, per trovare un errore.", r: 'no',
+    p: "È materiale riservato dell'azienda, come nel caso Samsung. Serve un'autorizzazione o uno strumento approvato." },
+  { t: "Come posso strutturare un curriculum per una candidatura da magazziniere?", r: 'si',
+    p: "Richiesta generica. Non servono dati personali." },
+  { t: "Una foto della mia carta d'identità, per farmi leggere i dati.", r: 'no',
+    p: "Un documento d'identità non va caricato su un servizio pubblico: permette furti d'identità." },
+  { t: "Il testo di un articolo di giornale già pubblicato, da riassumere.", r: 'si',
+    p: "Il contenuto è già pubblico e non riguarda dati privati tuoi o di altri." },
+  { t: "Un referto medico con nome, cognome e data di nascita, per farmelo spiegare.", r: 'no',
+    p: "Sono dati sulla salute, categoria particolarmente protetta, e identificano una persona." },
+  { t: "Lo stesso referto, dopo aver cancellato nome, data di nascita, struttura e ogni altro dato identificativo.", r: 'anon',
+    p: "Con i dati anonimizzati il rischio si riduce molto. Controlla di aver tolto tutto e valuta se ti serve davvero." },
+  { t: "Il verbale di una riunione di lavoro con i nomi dei colleghi e le decisioni interne, per fare un riassunto.", r: 'anon',
+    p: "Sostituisci i nomi e verifica che le regole dell'azienda lo permettano. Le decisioni interne possono essere riservate." },
+  { t: "La mia password, per chiedere se è sicura.", r: 'no',
+    p: "Una password non va mai scritta in un chatbot. Usa un gestore di password o lo strumento del modulo 5." }
+];
+var ETICHETTE = { si: 'Sì', anon: 'Solo dopo averlo anonimizzato', no: 'No' };
+var contenitore = document.getElementById('casi');
+var punteggio = document.getElementById('punteggio');
+var corretti = 0, risposti = 0;
+
+CASI.forEach(function (c, i) {
+  var sez = document.createElement('section');
+  sez.className = 'card';
+  var h = document.createElement('h3');
+  h.textContent = 'Caso ' + (i + 1);
+  var p = document.createElement('p');
+  p.textContent = c.t;
+  var az = document.createElement('div');
+  az.className = 'azioni';
+  var esito = document.createElement('div');
+  esito.className = 'esito';
+  esito.hidden = true;
+  esito.setAttribute('aria-live', 'polite');
+
+  ['si', 'anon', 'no'].forEach(function (k) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn secondario';
+    b.textContent = ETICHETTE[k];
+    b.addEventListener('click', function () {
+      var buoni = k === c.r;
+      az.querySelectorAll('button').forEach(function (x) { x.disabled = true; });
+      b.classList.remove('secondario');
+      b.classList.add('scelto');
+      esito.hidden = false;
+      esito.className = 'esito ' + (buoni ? 'giusto' : 'rivedi');
+      esito.innerHTML = '';
+      var s = document.createElement('strong');
+      s.textContent = buoni ? 'Corretto' : 'Da rivedere. La risposta giusta è: ' + ETICHETTE[c.r];
+      esito.appendChild(s);
+      esito.appendChild(document.createTextNode(c.p));
+      risposti++;
+      if (buoni) corretti++;
+      punteggio.textContent = 'Risposte corrette: ' + corretti + ' su ' + CASI.length +
+        (risposti === CASI.length ? ' (completato)' : '');
+    });
+    az.appendChild(b);
+  });
+
+  sez.appendChild(h); sez.appendChild(p); sez.appendChild(az); sez.appendChild(esito);
+  contenitore.appendChild(sez);
+});
+</script>
+</body>
+</html>

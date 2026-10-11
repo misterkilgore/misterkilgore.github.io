@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy e IA: dati raccolti e loro utilizzo</title>
+<link rel="stylesheet" href="stile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="corso" href="index.html">Indice del corso</a>
+    <span class="posizione">Modulo 1 di 5</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Privacy e IA: dati raccolti e loro utilizzo</h1>
+  <p class="sottotitolo">Cosa si può capire di te da dati che non hai mai dichiarato.</p>
+
+  <h2>Tre tipi di dati</h2>
+  <p>I sistemi di intelligenza artificiale usano diversi tipi di dati per costruire un profilo dell'utente e prevedere che cosa potrebbe voler vedere o fare dopo.</p>
+  <div class="scorri">
+    <table>
+      <thead><tr><th>Tipo</th><th>Che cos'è</th><th>Esempi</th></tr></thead>
+      <tbody>
+        <tr><td>Dati personali</td><td>Ti identificano direttamente.</td><td>Nome, email, numero di telefono, data di nascita.</td></tr>
+        <tr><td>Dati comportamentali</td><td>Descrivono ciò che fai online.</td><td>Ricerche, clic, acquisti, like, video guardati, tempo passato su una pagina.</td></tr>
+        <tr><td>Dati contestuali</td><td>Descrivono la situazione in cui ti trovi.</td><td>Posizione, orario, dispositivo, rete Wi-Fi, lingua.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="nota">
+    <p><strong>Un caso noto.</strong> Un'inchiesta del New York Times (2012) raccontò che la catena di negozi Target analizzava gli acquisti dei clienti per stimare una possibile gravidanza e inviare coupon mirati. I dettagli del racconto sono stati discussi, ma l'esempio mostra il principio: dagli acquisti di tutti i giorni si possono dedurre informazioni molto private.</p>
+  </div>
+
+  <h2>Esercizio: il detective dei dati</h2>
+  <p>Qui sotto trovi i dati di una persona <strong>inventata</strong>. Non c'è scritto nulla di esplicito su età, salute o lavoro. Per ogni domanda scrivi la tua ipotesi, poi scopri che cosa potrebbe dedurre un algoritmo.</p>
+
+  <div class="scorri">
+    <table>
+      <caption class="piccolo" style="text-align:left; padding-bottom:0.4rem;">Utente 4821 (persona fittizia)</caption>
+      <thead><tr><th>Tipo</th><th>Dati registrati</th></tr></thead>
+      <tbody>
+        <tr><td>Ricerche</td><td>scarpe running neutre; tabelle allenamento mezza maratona; integratori magnesio; orari farmacia di turno; ricette senza lattosio; come cambiare lavoro a 40 anni; bilancio delle competenze</td></tr>
+        <tr><td>Acquisti</td><td>latte senza lattosio; cuffie bluetooth; libro "Comunicazione efficace"; cuscino cervicale; zaino scolastico</td></tr>
+        <tr><td>Posizioni</td><td>Dal lunedì al venerdì 8:30-18:00 in una zona industriale; un martedì mattina ogni due settimane presso un ospedale; sabato mattina al parco</td></tr>
+        <tr><td>Pagine seguite</td><td>Corsa amatoriale; gruppo "Intolleranze alimentari"; offerte di lavoro; genitori della scuola primaria</td></tr>
+        <tr><td>Orari online</td><td>Attivo fino a mezzanotte e mezza; prima attività del mattino alle 6:00</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pila" id="detective">
+    <section class="card" aria-labelledby="d1">
+      <h3 id="d1">1. Che età ha e com'è la sua famiglia?</h3>
+      <label for="i1">La tua ipotesi</label>
+      <textarea id="i1" style="min-height:4.5rem"></textarea>
+      <div class="azioni"><button class="btn secondario" type="button" data-apri="r1" aria-expanded="false">Mostra la deduzione</button></div>
+      <div class="esito giusto" id="r1" hidden>
+        <strong>Deduzione possibile</strong>
+        Circa 40 anni, probabilmente genitore di un bambino che va alle elementari (zaino scolastico, pagine dei genitori). Sta pensando a un cambiamento di lavoro.
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="d2">
+      <h3 id="d2">2. Ha problemi di salute?</h3>
+      <label for="i2">La tua ipotesi</label>
+      <textarea id="i2" style="min-height:4.5rem"></textarea>
+      <div class="azioni"><button class="btn secondario" type="button" data-apri="r2" aria-expanded="false">Mostra la deduzione</button></div>
+      <div class="esito giusto" id="r2" hidden>
+        <strong>Deduzione possibile</strong>
+        Una probabile intolleranza al lattosio, dolori cervicali e visite mediche ricorrenti. Sono <em>dati sulla salute</em>, che il GDPR tratta come categoria particolare, ma qui nessuno li ha dichiarati: sono stati ricavati.
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="d3">
+      <h3 id="d3">3. Che lavoro fa e cosa sta cercando?</h3>
+      <label for="i3">La tua ipotesi</label>
+      <textarea id="i3" style="min-height:4.5rem"></textarea>
+      <div class="azioni"><button class="btn secondario" type="button" data-apri="r3" aria-expanded="false">Mostra la deduzione</button></div>
+      <div class="esito giusto" id="r3" hidden>
+        <strong>Deduzione possibile</strong>
+        Lavora in un'azienda di una zona industriale e cerca attivamente un'alternativa. È un bersaglio per annunci di agenzie del lavoro, corsi di formazione e prodotti finanziari.
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="d4">
+      <h3 id="d4">4. Com'è la sua giornata e come sta?</h3>
+      <label for="i4">La tua ipotesi</label>
+      <textarea id="i4" style="min-height:4.5rem"></textarea>
+      <div class="azioni"><button class="btn secondario" type="button" data-apri="r4" aria-expanded="false">Mostra la deduzione</button></div>
+      <div class="esito giusto" id="r4" hidden>
+        <strong>Deduzione possibile</strong>
+        Dorme circa cinque ore a notte e probabilmente è sotto pressione. Pratica sport amatoriale. Annunci tipici: integratori, app per dormire e per la meditazione.
+      </div>
+    </section>
+  </div>
+
+  <h2>Discussione</h2>
+  <ul>
+    <li>Queste deduzioni sono certezze? Quali potrebbero essere sbagliate? (Per esempio: il latte potrebbe essere per un familiare.)</li>
+    <li>Se sono sbagliate, il sistema smette di usarle? Di solito no: agisce comunque sulla base della probabilità.</li>
+    <li>Chi può comprare o vedere queste informazioni?</li>
+    <li>Quali di questi dati hai fornito tu volontariamente e quali sono stati ricavati?</li>
+  </ul>
+
+  <div class="nota attenzione">
+    <p><strong>Da ricordare.</strong> Se una domanda parla di profilazione, i dati usati sono dati personali, comportamentali e contestuali. Cronologia delle ricerche e interazioni online sono i dati comportamentali più usati.</p>
+  </div>
+
+  <h2>Dal vivo: che cosa ha registrato Google su di te</h2>
+  <p>Chi vuole può aprire la pagina <strong>Attività Google</strong> con il proprio account. Non serve mostrare lo schermo agli altri.</p>
+  <div class="azioni">
+    <a class="btn" href="https://myactivity.google.com" target="_blank" rel="noopener">Apri Attività Google</a>
+  </div>
+  <ol class="passi">
+    <li>Accedi con il tuo account Google, se ne hai uno.</li>
+    <li>Guarda le ultime voci: ricerche, siti, video, posizioni.</li>
+    <li>Usa il filtro per data o per prodotto (Ricerca, YouTube, Maps) per vedere quanto indietro arriva la cronologia.</li>
+    <li>Nelle impostazioni di <em>Attività web e app</em> puoi mettere in pausa il salvataggio o eliminare in automatico i dati più vecchi.</li>
+  </ol>
+  <p class="piccolo">Il collegamento apre un sito esterno. Se non hai un account Google puoi seguire la dimostrazione sullo schermo del formatore.</p>
+
+  <nav class="sfoglia" aria-label="Moduli">
+    <a href="index.html">Torna all'indice</a>
+    <a href="02-privacy-nei-sistemi-ia.html">Modulo 2: Protezione della privacy nei sistemi IA</a>
+  </nav>
+</main>
+
+<footer class="sito"><div class="wrap">Tutti i dati di questa pagina sono inventati.</div></footer>
+
+<script>
+document.querySelectorAll('[data-apri]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var box = document.getElementById(b.getAttribute('data-apri'));
+    var aperto = !box.hidden;
+    box.hidden = aperto;
+    b.setAttribute('aria-expanded', String(!aperto));
+    b.textContent = aperto ? 'Mostra la deduzione' : 'Nascondi la deduzione';
+  });
+});
+</script>
+</body>
+</html>

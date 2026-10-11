@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Targetizzazione</title>
+<link rel="stylesheet" href="stile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="corso" href="index.html">Indice del corso</a>
+    <span class="posizione">Modulo 3 di 5</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Targetizzazione</h1>
+  <p class="sottotitolo">Come pochi clic diventano un profilo e una pubblicità su misura.</p>
+
+  <p>La targetizzazione (in inglese <em>targeting</em>) consiste nel mostrare a ciascuna persona contenuti e pubblicità scelti in base al suo profilo. I sistemi di IA sono molto bravi a prevedere che cosa ti interesserà, perché imparano da milioni di utenti simili a te.</p>
+
+  <h2>Simulatore: dai clic al profilo</h2>
+  <p>Seleziona alcune azioni di un utente immaginario. Il simulatore mostra che cosa un sistema potrebbe dedurre e quali pubblicità potrebbe proporgli. È una semplificazione didattica, non il funzionamento reale di una piattaforma.</p>
+
+  <fieldset style="border:0; padding:0; margin:0;">
+    <legend style="font-weight:600; margin-bottom:0.4rem;">Azioni dell'utente</legend>
+    <ul class="scelte" id="azioni"></ul>
+  </fieldset>
+  <div class="azioni"><button class="btn secondario" type="button" id="azzera">Deseleziona tutto</button></div>
+
+  <div class="griglia" aria-live="polite">
+    <section class="card">
+      <h3>Che cosa si può dedurre</h3>
+      <ul id="dedotto"><li>Seleziona almeno un'azione.</li></ul>
+    </section>
+    <section class="card">
+      <h3>Pubblicità che potrebbe vedere</h3>
+      <ul id="pubblicita"><li>Seleziona almeno un'azione.</li></ul>
+    </section>
+  </div>
+  <p id="avviso" class="nota" hidden></p>
+
+  <h2>Perché può essere un rischio</h2>
+  <ul>
+    <li><strong>Dati sensibili dedotti.</strong> Salute, orientamento politico o religioso possono essere ricavati da azioni quotidiane, anche se non li hai mai dichiarati.</li>
+    <li><strong>Influenza sulle scelte.</strong> Raccogliendo dati personali e comportamentali, la targetizzazione può spingere decisioni di consumo, o anche di voto, senza che te ne accorga.</li>
+    <li><strong>Persone vulnerabili.</strong> Chi cerca lavoro o è in difficoltà economica può ricevere proposte aggressive, come prestiti molto costosi.</li>
+    <li><strong>Bolla di contenuti.</strong> Vedi sempre ciò che conferma i tuoi interessi e meno altre opinioni.</li>
+  </ul>
+
+  <div class="nota">
+    <p><strong>Un caso: Cambridge Analytica.</strong> Nel 2018 si seppe che i dati di milioni di utenti Facebook (la società parlò di fino a 87 milioni di persone) erano stati raccolti tramite un'app a quiz e usati per profilare gli elettori. Molti utenti non sapevano che i propri dati fossero stati condivisi.</p>
+  </div>
+  <p>In Europa, il regolamento sui servizi digitali (DSA) vieta alle grandi piattaforme di mostrare pubblicità basata su dati sensibili e di rivolgere pubblicità personalizzata ai minori. Le regole esistono, ma conoscere le impostazioni resta utile.</p>
+
+  <h2>Esperimento in aula</h2>
+  <ol class="passi">
+    <li>Tutti cercano la stessa espressione, per esempio "scarpe da corsa", dal proprio telefono.</li>
+    <li>Nei giorni successivi ognuno nota gli annunci che riceve.</li>
+    <li>All'incontro seguente si confrontano: sono uguali? Cosa cambia tra una persona e l'altra, e perché?</li>
+  </ol>
+
+  <h2>Dal vivo: gli interessi che Google ti attribuisce</h2>
+  <p>Nel Centro annunci Google puoi vedere gli interessi collegati al tuo account e spegnere la personalizzazione.</p>
+  <div class="azioni">
+    <a class="btn" href="https://myadcenter.google.com" target="_blank" rel="noopener">Apri il Centro annunci Google</a>
+  </div>
+  <ol class="passi">
+    <li>Accedi con il tuo account, se ne hai uno.</li>
+    <li>Guarda l'elenco degli interessi e degli argomenti: quali sono corretti? Quali ti sorprendono?</li>
+    <li>Prova a disattivare la personalizzazione degli annunci e osserva che cosa cambia nella pagina.</li>
+  </ol>
+  <p class="piccolo">Il collegamento apre un sito esterno. Disattivare la personalizzazione non elimina gli annunci, ma li rende meno legati al tuo profilo.</p>
+
+  <nav class="sfoglia" aria-label="Moduli">
+    <a href="02-privacy-nei-sistemi-ia.html">Modulo 2: Protezione della privacy nei sistemi IA</a>
+    <a href="04-impostazioni-social-cloud.html">Modulo 4: Impostazioni su social e cloud</a>
+  </nav>
+</main>
+
+<footer class="sito"><div class="wrap">Il simulatore è una semplificazione didattica: non si collega a nessuna piattaforma e non salva nulla.</div></footer>
+
+<script>
+var AZIONI = [
+  { n: 'Segue una pagina di corsa amatoriale', d: ['Pratica sport, probabilmente con regolarità'], a: ['Scarpe da running', 'Integratori', 'Orologi sportivi'] },
+  { n: 'Cerca "mutuo tasso fisso"', d: ['Valuta di comprare casa'], a: ['Mutui', 'Assicurazioni sulla casa', 'Mobili e arredamento'] },
+  { n: 'Guarda video di ricette vegane', d: ['Segue un'+"'"+'alimentazione a base vegetale'], a: ['Prodotti biologici', 'Ristoranti vegani'] },
+  { n: 'Cerca voli per Lisbona', d: ['Ha un viaggio in programma'], a: ['Hotel', 'Noleggio auto', 'Assicurazione di viaggio'] },
+  { n: 'Mette like a pagine di politica', d: ['Possibile orientamento politico (dato sensibile)'], a: ['Messaggi elettorali mirati', 'Petizioni', 'Notizie di parte'], s: true },
+  { n: 'Cerca "mal di schiena"', d: ['Possibile problema di salute (dato sensibile)'], a: ['Materassi', 'Fisioterapisti', 'Integratori'], s: true },
+  { n: 'Compra giocattoli', d: ['Probabile genitore di un bambino piccolo'], a: ['Abbigliamento per bambini', 'Passeggini', 'Assicurazioni sulla vita'] },
+  { n: 'Segue pagine di offerte di lavoro', d: ['È in cerca di lavoro o vuole cambiarlo'], a: ['Corsi di formazione', 'Agenzie per il lavoro', 'Prestiti rapidi'] },
+  { n: 'Gioca online fino a tarda notte', d: ['Abitudini notturne, sonno ridotto'], a: ['Bevande energetiche', 'Giochi con acquisti in app'] },
+  { n: 'Cerca "come smettere di fumare"', d: ['Fuma o ha fumato (dato sulla salute)'], a: ['Cerotti e prodotti per smettere', 'Assicurazioni sulla salute'], s: true },
+  { n: 'Passa molte ore al giorno sui social', d: ['Alta esposizione agli annunci'], a: ['Acquisti d'+"'"+'impulso', 'Offerte a tempo limitato'] },
+  { n: 'Guarda tutorial di Excel', d: ['Lavoro d'+"'"+'ufficio o studio'], a: ['Corsi online', 'Software per l'+"'"+'ufficio'] }
+];
+
+var lista = document.getElementById('azioni');
+var dedotto = document.getElementById('dedotto');
+var pubblicita = document.getElementById('pubblicita');
+var avviso = document.getElementById('avviso');
+
+AZIONI.forEach(function (x, i) {
+  var li = document.createElement('li');
+  var lab = document.createElement('label');
+  var cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.value = i;
+  cb.addEventListener('change', aggiorna);
+  lab.appendChild(cb);
+  lab.appendChild(document.createTextNode(x.n));
+  li.appendChild(lab);
+  lista.appendChild(li);
+});
+
+function riempi(ul, voci, vuoto) {
+  ul.innerHTML = '';
+  if (!voci.length) { var l = document.createElement('li'); l.textContent = vuoto; ul.appendChild(l); return; }
+  voci.forEach(function (v) { var l = document.createElement('li'); l.textContent = v; ul.appendChild(l); });
+}
+
+function aggiorna() {
+  var scelte = Array.prototype.slice.call(lista.querySelectorAll('input:checked')).map(function (c) { return AZIONI[c.value]; });
+  var d = [], a = [], sens = false;
+  scelte.forEach(function (x) {
+    x.d.forEach(function (v) { if (d.indexOf(v) < 0) d.push(v); });
+    x.a.forEach(function (v) { if (a.indexOf(v) < 0) a.push(v); });
+    if (x.s) sens = true;
+  });
+  riempi(dedotto, d, 'Seleziona almeno un\u2019azione.');
+  riempi(pubblicita, a, 'Seleziona almeno un\u2019azione.');
+  var msg = '';
+  if (scelte.length >= 3) msg += 'Con ' + scelte.length + ' azioni il profilo è già abbastanza dettagliato: più dati si incrociano, più le previsioni diventano precise. ';
+  if (sens) msg += 'Alcune deduzioni riguardano dati sensibili, che il GDPR protegge in modo particolare.';
+  avviso.textContent = msg;
+  avviso.hidden = !msg;
+}
+
+document.getElementById('azzera').addEventListener('click', function () {
+  lista.querySelectorAll('input').forEach(function (c) { c.checked = false; });
+  aggiorna();
+});
+</script>
+</body>
+</html>

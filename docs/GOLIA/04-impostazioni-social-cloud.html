@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impostazioni di sicurezza su social e cloud</title>
+<link rel="stylesheet" href="stile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="corso" href="index.html">Indice del corso</a>
+    <span class="posizione">Modulo 4 di 5</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Impostazioni di sicurezza su social e cloud</h1>
+  <p class="sottotitolo">Laboratorio guidato: controlla i tuoi account mentre segui.</p>
+
+  <div class="nota attenzione">
+    <p><strong>Prima di iniziare.</strong> Queste operazioni si fanno sui tuoi account reali, quindi nessuna pagina può simularle. I nomi dei menu cambiano spesso: se non trovi una voce, cerca una parola simile o chiedi al formatore. Non condividere schermate con dati personali.</p>
+  </div>
+
+  <h2>Quando una condivisione innocua diventa un rischio</h2>
+  <p>Nel 2018 la mappa globale delle attività sportive di un'app di corsa mostrò, per chi sapeva leggerla, i percorsi di persone in luoghi sensibili, comprese zone militari. Nessuno aveva fatto nulla di strano: avevano lasciato le impostazioni predefinite.</p>
+  <p>Domanda per il gruppo: quali delle nostre app condividono posizione, orari o abitudini senza che ce ne accorgiamo?</p>
+
+  <h2>Le cinque verifiche</h2>
+  <div class="pila">
+
+    <section class="card" aria-labelledby="v1">
+      <h3 id="v1">Account Google: controllo privacy e sicurezza</h3>
+      <ol class="passi">
+        <li>Apri il Controllo privacy dell'account Google.</li>
+        <li>Rivedi le attività salvate (web, app, posizione, YouTube) e decidi quali tenere.</li>
+        <li>Controlla i dispositivi e le app a cui hai dato accesso all'account.</li>
+        <li>Attiva la verifica in due passaggi, se non lo hai ancora fatto.</li>
+      </ol>
+      <div class="azioni">
+        <a class="btn secondario" href="https://myaccount.google.com/privacycheckup" target="_blank" rel="noopener">Controllo privacy Google</a>
+        <a class="btn secondario" href="https://myaccount.google.com/security" target="_blank" rel="noopener">Sicurezza dell'account</a>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="v2">
+      <h3 id="v2">Facebook e Instagram</h3>
+      <ol class="passi">
+        <li>Apri le impostazioni e cerca "Controllo privacy" o "Verifica della privacy".</li>
+        <li>Scegli chi può vedere i tuoi post: amici, persone specifiche o tutti.</li>
+        <li>Controlla chi può trovarti con email o numero di telefono.</li>
+        <li>Su Instagram valuta l'<em>account privato</em>: solo chi approvi può vedere i tuoi contenuti.</li>
+        <li>Rivedi le app e i siti collegati al tuo account e rimuovi quelli che non usi.</li>
+      </ol>
+      <div class="azioni">
+        <a class="btn secondario" href="https://www.facebook.com/privacy/checkup" target="_blank" rel="noopener">Controllo privacy Facebook</a>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="v3">
+      <h3 id="v3">Cloud: Drive, OneDrive e simili</h3>
+      <p>L'errore più comune è condividere un file con "chiunque abbia il link". Chi ottiene il link, anche per caso, può aprire il file.</p>
+      <ol class="passi">
+        <li>Apri un file o una cartella e scegli <em>Condividi</em>.</li>
+        <li>Guarda l'impostazione di accesso: deve essere <em>Limitato</em> (Drive) o <em>Persone specifiche</em> (OneDrive), non "chiunque abbia il link".</li>
+        <li>Controlla l'elenco delle persone con accesso e togli chi non serve più.</li>
+        <li>Imposta una scadenza dell'accesso, quando disponibile.</li>
+      </ol>
+    </section>
+
+    <section class="card" aria-labelledby="v4">
+      <h3 id="v4">Telefono: autorizzazioni delle app</h3>
+      <ol class="passi">
+        <li>Apri le impostazioni del telefono e cerca <em>Privacy</em> (iPhone) o <em>Privacy / Autorizzazioni</em> (Android).</li>
+        <li>Scegli una autorizzazione sensibile, per esempio <em>Posizione</em>, <em>Microfono</em> o <em>Fotocamera</em>.</li>
+        <li>Guarda quali app la usano e imposta "Mentre usi l'app" oppure "Mai" per quelle che non ne hanno bisogno.</li>
+        <li>Disattiva la posizione precisa per le app che non la richiedono davvero.</li>
+      </ol>
+    </section>
+
+    <section class="card" aria-labelledby="v5">
+      <h3 id="v5">I tuoi dati sono già stati diffusi?</h3>
+      <p>Il servizio Have I Been Pwned controlla se un indirizzo email compare in violazioni di dati note. Inserisci solo la tua email, mai password.</p>
+      <ol class="passi">
+        <li>Apri il sito e scrivi la tua email.</li>
+        <li>Guarda in quali violazioni compare e quali dati sono stati diffusi.</li>
+        <li>Cambia la password dei servizi coinvolti e di quelli dove l'avevi riusata.</li>
+      </ol>
+      <div class="azioni">
+        <a class="btn secondario" href="https://haveibeenpwned.com" target="_blank" rel="noopener">Have I Been Pwned</a>
+      </div>
+    </section>
+  </div>
+
+  <h2>Il mio elenco di verifica</h2>
+  <p>Spunta ciò che hai fatto. Lo stato non viene salvato: se chiudi la pagina si azzera.</p>
+  <ul class="verifica" id="elenco">
+    <li><label><input type="checkbox"> Ho controllato le attività salvate nel mio account Google</label></li>
+    <li><label><input type="checkbox"> Ho attivato la verifica in due passaggi su almeno un account</label></li>
+    <li><label><input type="checkbox"> Ho controllato chi può vedere i miei post sui social</label></li>
+    <li><label><input type="checkbox"> Ho controllato un file condiviso sul cloud e tolto l'accesso "chiunque abbia il link"</label></li>
+    <li><label><input type="checkbox"> Ho rivisto le autorizzazioni di posizione delle app sul telefono</label></li>
+    <li><label><input type="checkbox"> Ho controllato la mia email su Have I Been Pwned</label></li>
+  </ul>
+  <p class="punteggio" id="conteggio" aria-live="polite">Completate: 0 su 6</p>
+
+  <nav class="sfoglia" aria-label="Moduli">
+    <a href="03-targetizzazione.html">Modulo 3: Targetizzazione</a>
+    <a href="05-anonimizzazione.html">Modulo 5: Anonimizzazione</a>
+  </nav>
+</main>
+
+<footer class="sito"><div class="wrap">I collegamenti aprono siti esterni. Le interfacce possono essere cambiate dai gestori senza preavviso.</div></footer>
+
+<script>
+var caselle = document.querySelectorAll('#elenco input');
+var conteggio = document.getElementById('conteggio');
+function conta() {
+  var n = document.querySelectorAll('#elenco input:checked').length;
+  conteggio.textContent = 'Completate: ' + n + ' su ' + caselle.length;
+}
+caselle.forEach(function (c) { c.addEventListener('change', conta); });
+</script>
+</body>
+</html>

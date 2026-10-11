@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anonimizzazione dei dati sensibili</title>
+<link rel="stylesheet" href="stile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="corso" href="index.html">Indice del corso</a>
+    <span class="posizione">Modulo 5 di 5</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Anonimizzazione dei dati sensibili</h1>
+  <p class="sottotitolo">Tre strumenti per proteggere i dati prima di condividerli.</p>
+
+  <div class="nota">
+    <p><strong>Tutto avviene sul tuo dispositivo.</strong> Foto, testi e password restano nella pagina e non vengono inviati a nessun server. Per verificarlo, disattiva il Wi-Fi e i dati mobili: gli strumenti continuano a funzionare.</p>
+  </div>
+
+  <p>In questa pagina:
+    <a href="#metadati">Metadati delle foto</a>,
+    <a href="#testi">Anonimizzare un testo</a>,
+    <a href="#password">Forza di una password</a>.
+  </p>
+
+  <!-- ===================== METADATI ===================== -->
+  <h2 id="metadati">Strumento 1: metadati delle foto</h2>
+  <p>Ogni foto scattata con un telefono contiene informazioni nascoste (dati EXIF): modello del dispositivo, data e ora e, se la posizione era attiva, le coordinate GPS del punto di scatto. Condividere una foto di casa tua può significare condividere dove abiti.</p>
+
+  <div class="card">
+    <label for="foto">Scegli una foto (JPEG)</label>
+    <input type="file" id="foto" accept="image/*">
+    <p class="piccolo" style="margin-top:0.6rem">Per una prova realistica scatta una foto con la fotocamera del telefono, con la posizione attiva. Le schermate e le foto ricevute da molte app di messaggistica non hanno metadati, perché vengono già ripulite.</p>
+  </div>
+
+  <div id="risFoto" hidden style="margin-top:1.25rem">
+    <div class="griglia">
+      <div>
+        <h3>Anteprima</h3>
+        <img id="anteprima" alt="Anteprima della foto selezionata" style="max-width:100%; max-height:16rem; border:1px solid var(--grigio); border-radius:4px;">
+      </div>
+      <div>
+        <h3>Che cosa rivela questa foto</h3>
+        <p id="sintesiFoto" class="punteggio"></p>
+      </div>
+    </div>
+    <div class="scorri">
+      <table>
+        <thead><tr><th>Dato</th><th>Valore</th><th>Cosa può rivelare</th></tr></thead>
+        <tbody id="tabFoto"></tbody>
+      </table>
+    </div>
+    <p id="mappa" class="piccolo"></p>
+
+    <h3>Copia senza metadati</h3>
+    <p>Lo strumento ricostruisce l'immagine da zero, senza copiare i dati nascosti. La qualità resta molto simile all'originale.</p>
+    <div class="azioni" id="azioniPulita"></div>
+    <p id="verifica" class="esito giusto" hidden></p>
+  </div>
+
+  <details>
+    <summary>Come si fa senza questo strumento</summary>
+    <ul>
+      <li><strong>Windows:</strong> tasto destro sul file, Proprietà, Dettagli, "Rimuovi proprietà e informazioni personali".</li>
+      <li><strong>iPhone:</strong> nella schermata di condivisione tocca "Opzioni" e disattiva "Posizione".</li>
+      <li><strong>Android:</strong> nelle impostazioni della fotocamera disattiva "Tag di posizione". Per le foto già scattate molte gallerie permettono di rimuovere la posizione dai dettagli.</li>
+    </ul>
+    <p class="piccolo">I percorsi cambiano con le versioni del sistema operativo.</p>
+  </details>
+
+  <!-- ===================== TESTI ===================== -->
+  <h2 id="testi">Strumento 2: anonimizzare un testo</h2>
+  <p>Prima di incollare un testo in un chatbot o di inviarlo ad altri, sostituisci i dati che identificano le persone con segnaposto. Lo strumento riconosce in automatico codici fiscali, IBAN, email, telefoni, date, carte di pagamento e alcuni indirizzi. Per i nomi puoi indicare tu le parole da nascondere.</p>
+
+  <div class="azioni"><button class="btn secondario" type="button" id="esempio">Inserisci un testo di esempio</button></div>
+
+  <div class="griglia">
+    <div>
+      <label for="testoIn">Testo originale</label>
+      <textarea id="testoIn" style="min-height:14rem" placeholder="Incolla qui il testo"></textarea>
+    </div>
+    <div>
+      <label for="testoOut">Testo anonimizzato</label>
+      <textarea id="testoOut" style="min-height:14rem" readonly></textarea>
+    </div>
+  </div>
+
+  <div class="griglia" style="margin-top:1rem">
+    <div>
+      <label for="termini">Parole da nascondere (una per riga)</label>
+      <textarea id="termini" style="min-height:5.5rem" placeholder="Per esempio:&#10;Mario Rossi&#10;Modena"></textarea>
+    </div>
+    <div>
+      <label style="display:flex; gap:0.6rem; align-items:flex-start; font-weight:400; cursor:pointer;">
+        <input type="checkbox" id="euristica" style="width:1.15rem; height:1.15rem; margin-top:0.3rem; accent-color:var(--scuro)">
+        <span>Prova a riconoscere nomi propri (approssimativo)</span>
+      </label>
+      <p class="piccolo" style="margin-top:0.5rem">Cerca parole consecutive con l'iniziale maiuscola. Sbaglia spesso: è utile per vedere i limiti di un riconoscimento automatico.</p>
+    </div>
+  </div>
+
+  <div class="azioni">
+    <button class="btn" type="button" id="copia">Copia il testo anonimizzato</button>
+    <span id="copiaEsito" class="piccolo" role="status" style="align-self:center"></span>
+  </div>
+  <div class="esito giusto" id="riepilogo" aria-live="polite" hidden></div>
+
+  <div class="nota attenzione">
+    <p><strong>Rileggi sempre il risultato.</strong> Nel testo di esempio lo strumento non nasconde la città (se non la indichi tu) né il reparto, il motivo dell'assenza o i tempi: messi insieme possono comunque far riconoscere una persona. L'automatismo aiuta, ma il controllo umano resta necessario.</p>
+  </div>
+
+  <details>
+    <summary>Attenzione ai documenti: coprire non è cancellare</summary>
+    <p>In un PDF o in un documento Word, un rettangolo nero disegnato sopra il testo non lo elimina: chi seleziona e copia l'area vede ancora il contenuto sotto. Per oscurare davvero usa la funzione di <em>redazione</em> (per esempio in Adobe Acrobat o in PDF24), poi prova a selezionare e copiare l'area per verificare che il testo non ci sia più.</p>
+    <p>Nei file Word controlla anche i metadati: in <em>File, Informazioni, Controllo documento</em> trovi autore, revisioni e commenti nascosti.</p>
+  </details>
+
+  <!-- ===================== PASSWORD ===================== -->
+  <h2 id="password">Strumento 3: forza di una password</h2>
+  <p>Scrivi una password <strong>di prova</strong>. Non usare mai una password vera in strumenti che non conosci, anche se questo non invia nulla.</p>
+
+  <div class="card">
+    <label for="pw">Password di prova</label>
+    <input type="password" id="pw" autocomplete="off" spellcheck="false">
+    <label style="display:flex; gap:0.5rem; align-items:center; font-weight:400; margin-top:0.6rem; cursor:pointer;">
+      <input type="checkbox" id="mostra" style="width:1.1rem; height:1.1rem; accent-color:var(--scuro)"> Mostra i caratteri
+    </label>
+    <div class="misura" style="margin-top:0.9rem" role="progressbar" aria-label="Forza stimata" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="barraWrap"><div id="barra"></div></div>
+    <p class="punteggio" id="giudizio" style="margin-top:0.7rem" aria-live="polite">Scrivi una password per iniziare.</p>
+    <ul id="dettagli"></ul>
+  </div>
+
+  <h3 style="margin-top:1.5rem">Consigli</h3>
+  <ul>
+    <li>Più è lunga, meglio è. Una frase di quattro o cinque parole casuali ("cavallo vela tazza nuvola") è più forte e più facile da ricordare di una breve piena di simboli.</li>
+    <li>Una password diversa per ogni servizio: se uno viene violato, gli altri restano protetti.</li>
+    <li>Usa un gestore di password (per esempio Bitwarden o quello integrato nel browser) per non doverle ricordare tutte.</li>
+    <li>Sostituire le lettere con simboli ("a" con "@", "o" con "0") è un trucco conosciuto da chi tenta di indovinare le password: protegge poco.</li>
+  </ul>
+  <p class="piccolo">La stima è didattica e semplificata: ipotizza un attacco molto veloce (dieci miliardi di tentativi al secondo) e non sostituisce un controllo professionale.</p>
+
+  <nav class="sfoglia" aria-label="Moduli">
+    <a href="04-impostazioni-social-cloud.html">Modulo 4: Impostazioni su social e cloud</a>
+    <a href="index.html">Torna all'indice</a>
+  </nav>
+</main>
+
+<footer class="sito"><div class="wrap">Gli strumenti di questa pagina funzionano solo nel browser. I dati inseriti non vengono salvati né inviati.</div></footer>
+
+<script>
+/* ============ 1. METADATI ============ */
+var TIPI = { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 7: 1, 9: 4, 10: 8 };
+
+function leggiTiff(v, ini) {
+  var le = v.getUint16(ini) === 0x4949;
+  function u16(o) { return v.getUint16(o, le); }
+  function u32(o) { return v.getUint32(o, le); }
+  function valore(e) {
+    var tipo = u16(e + 2), n = u32(e + 4), dim = (TIPI[tipo] || 1) * n;
+    var p = dim > 4 ? ini + u32(e + 8) : e + 8;
+    if (p + dim > v.byteLength || n > 5000) return null;
+    var i, out = [];
+    if (tipo === 2) {
+      var s = '';
+      for (i = 0; i < n; i++) { var c = v.getUint8(p + i); if (c === 0) break; s += String.fromCharCode(c); }
+      return s.trim();
+    }
+    for (i = 0; i < n; i++) {
+      if (tipo === 3) out.push(u16(p + i * 2));
+      else if (tipo === 4 || tipo === 9) out.push(u32(p + i * 4));
+      else if (tipo === 5 || tipo === 10) { var a = u32(p + i * 8), b = u32(p + i * 8 + 4); out.push(b ? a / b : 0); }
+      else if (tipo === 1 || tipo === 7) out.push(v.getUint8(p + i));
+      else return null;
+    }
+    return out.length === 1 ? out[0] : out;
+  }
+  function ifd(o) {
+    var res = {};
+    if (!o || ini + o + 2 > v.byteLength) return res;
+    var n = u16(ini + o);
+    for (var i = 0; i < n; i++) {
+      var e = ini + o + 2 + i * 12;
+      if (e + 12 > v.byteLength) break;
+      res[u16(e)] = valore(e);
+    }
+    return res;
+  }
+  var i0 = ifd(u32(ini + 4));
+  var ex = i0[0x8769] != null ? ifd(i0[0x8769]) : {};
+  var gps = i0[0x8825] != null ? ifd(i0[0x8825]) : {};
+  return { i0: i0, ex: ex, gps: gps };
+}
+
+function leggiExif(buf) {
+  try {
+    var v = new DataView(buf);
+    if (v.byteLength < 4 || v.getUint16(0) !== 0xFFD8) return { jpeg: false };
+    var off = 2;
+    while (off + 4 <= v.byteLength) {
+      var marker = v.getUint16(off); off += 2;
+      if (marker === 0xFFDA || (marker & 0xFF00) !== 0xFF00) break;
+      var len = v.getUint16(off);
+      if (marker === 0xFFE1 && v.getUint32(off + 2) === 0x45786966) {
+        return { jpeg: true, dati: leggiTiff(v, off + 8) };
+      }
+      off += len;
+    }
+    return { jpeg: true, dati: null };
+  } catch (e) {
+    return { jpeg: true, dati: null };
+  }
+}
+
+function gradi(arr, rif) {
+  if (!arr || arr.length !== 3) return null;
+  var d = arr[0] + arr[1] / 60 + arr[2] / 3600;
+  return (rif === 'S' || rif === 'W') ? -d : d;
+}
+
+function dataIt(s) {
+  return s ? s.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$3/$2/$1') : s;
+}
+
+function riga(tbody, a, b, c) {
+  var tr = document.createElement('tr');
+  [a, b, c].forEach(function (t) {
+    var td = document.createElement('td');
+    td.textContent = t;
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+}
+
+function estrai(dati) {
+  var r = { righe: [], gps: null };
+  if (!dati) return r;
+  var i0 = dati.i0, ex = dati.ex, gps = dati.gps;
+  var disp = [i0[0x010F], i0[0x0110]].filter(Boolean).join(' ');
+  if (disp) r.righe.push(['Dispositivo', disp, 'Che telefono o fotocamera usi']);
+  var data = ex[0x9003] || i0[0x0132];
+  if (data) r.righe.push(['Data e ora dello scatto', dataIt(data), 'Quando eri lì, e le tue abitudini']);
+  if (i0[0x0131]) r.righe.push(['Programma usato', i0[0x0131], 'Software o versione del sistema']);
+  var lat = gradi(gps[2], gps[1]), lon = gradi(gps[4], gps[3]);
+  if (lat !== null && lon !== null) {
+    r.gps = { lat: lat, lon: lon };
+    r.righe.push(['Posizione GPS', lat.toFixed(5) + ', ' + lon.toFixed(5), 'Il luogo esatto dello scatto: casa, lavoro, scuola']);
+  }
+  return r;
+}
+
+function pulisciFoto(file) {
+  return new Promise(function (res, rej) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      var c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext('2d').drawImage(img, 0, 0);
+      c.toBlob(function (b) { URL.revokeObjectURL(url); b ? res(b) : rej(new Error('vuoto')); }, 'image/jpeg', 0.92);
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); rej(new Error('lettura')); };
+    img.src = url;
+  });
+}
+
+var inFoto = document.getElementById('foto');
+var linkPulita = null;
+
+inFoto.addEventListener('change', function () {
+  var f = inFoto.files[0];
+  if (!f) return;
+  var box = document.getElementById('risFoto');
+  var tab = document.getElementById('tabFoto');
+  var sintesi = document.getElementById('sintesiFoto');
+  var mappa = document.getElementById('mappa');
+  var azioni = document.getElementById('azioniPulita');
+  var verifica = document.getElementById('verifica');
+  tab.innerHTML = ''; azioni.innerHTML = ''; mappa.textContent = ''; verifica.hidden = true;
+  box.hidden = false;
+  if (linkPulita) { URL.revokeObjectURL(linkPulita); linkPulita = null; }
+  document.getElementById('anteprima').src = URL.createObjectURL(f);
+
+  f.arrayBuffer().then(function (buf) {
+    var r = leggiExif(buf);
+    var e = estrai(r.dati);
+    if (!r.jpeg) {
+      sintesi.textContent = 'Questo file non è un JPEG: lo strumento non legge i suoi metadati.';
+      riga(tab, 'Nessun dato letto', 'Formato diverso da JPEG', 'Le foto HEIC vanno condivise come JPEG. Le schermate e molti PNG non hanno questi dati.');
+    } else if (!e.righe.length) {
+      sintesi.textContent = 'Nessun metadato rilevante trovato.';
+      riga(tab, 'Nessun dato letto', 'Immagine senza metadati', 'La foto è già pulita, oppure è stata ripulita da un\u2019app di messaggistica.');
+    } else {
+      sintesi.textContent = e.gps ? 'Questa foto rivela dove è stata scattata.' : 'Questa foto contiene dati sul dispositivo e sulla data.';
+      e.righe.forEach(function (x) { riga(tab, x[0], x[1], x[2]); });
+    }
+    if (e.gps) {
+      var la = e.gps.lat.toFixed(5), lo = e.gps.lon.toFixed(5);
+      mappa.innerHTML = '';
+      var a = document.createElement('a');
+      a.href = 'https://www.openstreetmap.org/?mlat=' + la + '&mlon=' + lo + '#map=17/' + la + '/' + lo;
+      a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = 'Guarda il punto su una mappa';
+      mappa.appendChild(a);
+      mappa.appendChild(document.createTextNode(' (apre il sito OpenStreetMap: per farlo la pagina invia le coordinate a quel sito).'));
+    }
+    return pulisciFoto(f);
+  }).then(function (blob) {
+    linkPulita = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.className = 'btn';
+    a.href = linkPulita;
+    a.download = 'foto-senza-metadati.jpg';
+    a.textContent = 'Scarica la foto senza metadati';
+    azioni.appendChild(a);
+    return blob.arrayBuffer();
+  }).then(function (buf) {
+    var r = leggiExif(buf);
+    var e = estrai(r.dati);
+    verifica.hidden = false;
+    var s = document.createElement('strong');
+    s.textContent = 'Controllo sulla copia pulita';
+    verifica.innerHTML = '';
+    verifica.appendChild(s);
+    verifica.appendChild(document.createTextNode(e.righe.length
+      ? 'Sono ancora presenti alcuni dati: non condividere questa copia.'
+      : 'Nessun dato su dispositivo, data o posizione. Puoi condividerla.'));
+  }).catch(function () {
+    azioni.textContent = 'Non è stato possibile leggere questo file come immagine. Prova con un file JPEG.';
+  });
+});
+
+/* ============ 2. ANONIMIZZATORE ============ */
+var REGOLE = [
+  ['IBAN', /\b[A-Z]{2}\d{2}(?: ?[A-Z0-9]{4}){4,7}(?: ?[A-Z0-9]{1,3})?\b/gi],
+  ['CODICE FISCALE', /\b[A-Z]{6}\d{2}[A-EHLMPR-T]\d{2}[A-Z]\d{3}[A-Z]\b/gi],
+  ['EMAIL', /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g],
+  ['CARTA', /\b(?:\d{4}[ -]){3}\d{4}\b/g],
+  ['DATA', /\b\d{1,2}[\/.-]\d{1,2}[\/.-](?:\d{4}|\d{2})\b/g],
+  ['PARTITA IVA', /\b(?:p\.?\s?iva|partita\s+iva)[:\s]*\d{11}\b/gi],
+  ['TELEFONO', /(?:\+39[\s.]?)?\b3\d{2}[\s.-]?\d{6,7}\b|(?:\+39[\s.]?)?\b0\d{1,3}[\s.-]?\d{5,8}\b/g],
+  ['INDIRIZZO', /\b(?:[Vv]ia|[Vv]iale|[Pp]iazza|[Cc]orso|[Ll]argo|[Vv]icolo)\s+\p{Lu}[\p{L}'\u2019. ]{1,40}?,?\s*(?:n\.\s*)?\d{1,4}\b/gu]
+];
+var NOMI = /\b\p{Lu}\p{Ll}+(?:\s+\p{Lu}\p{Ll}+)+/gu;
+
+var tIn = document.getElementById('testoIn');
+var tOut = document.getElementById('testoOut');
+var tTerm = document.getElementById('termini');
+var tEur = document.getElementById('euristica');
+var riepilogo = document.getElementById('riepilogo');
+
+function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function anonimizza() {
+  var t = tIn.value;
+  var conteggi = {};
+  function conta(k) { conteggi[k] = (conteggi[k] || 0) + 1; }
+
+  tTerm.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean).forEach(function (term, i) {
+    t = t.replace(new RegExp(esc(term), 'gi'), function () { conta('parole indicate da te'); return '[NOME ' + (i + 1) + ']'; });
+  });
+  REGOLE.forEach(function (r) {
+    t = t.replace(r[1], function () { conta(r[0].toLowerCase()); return '[' + r[0] + ']'; });
+  });
+  if (tEur.checked) {
+    t = t.replace(NOMI, function () { conta('possibili nomi propri'); return '[NOME?]'; });
+  }
+  tOut.value = t;
+
+  var chiavi = Object.keys(conteggi);
+  if (!tIn.value) { riepilogo.hidden = true; return; }
+  riepilogo.hidden = false;
+  riepilogo.innerHTML = '';
+  var s = document.createElement('strong');
+  s.textContent = chiavi.length ? 'Elementi sostituiti' : 'Nessun elemento riconosciuto';
+  riepilogo.appendChild(s);
+  riepilogo.appendChild(document.createTextNode(chiavi.map(function (k) { return conteggi[k] + ' \u00d7 ' + k; }).join(', ')));
+}
+
+[tIn, tTerm].forEach(function (el) { el.addEventListener('input', anonimizza); });
+tEur.addEventListener('change', anonimizza);
+
+document.getElementById('esempio').addEventListener('click', function () {
+  tIn.value = 'Gentile Mario Rossi, nato il 10/12/1985, codice fiscale RSSMRA85T10A562S, residente in Via Garibaldi 12, Modena. ' +
+    'Può contattarmi al 333 1234567 o a mario.rossi@example.com. ' +
+    'Il rimborso va accreditato su IT60X0542811101000000123456. ' +
+    'La collega Lucia Bianchi, del reparto contabilità, è in malattia da due mesi per un intervento al ginocchio.';
+  anonimizza();
+});
+
+document.getElementById('copia').addEventListener('click', function () {
+  var esito = document.getElementById('copiaEsito');
+  function fatto(ok) { esito.textContent = ok ? 'Testo copiato.' : 'Copia non riuscita: seleziona il testo e copialo a mano.'; }
+  if (!tOut.value) { esito.textContent = 'Non c\u2019è ancora nessun testo da copiare.'; return; }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(tOut.value).then(function () { fatto(true); }, function () { fatto(false); });
+  } else {
+    tOut.select();
+    try { fatto(document.execCommand('copy')); } catch (e) { fatto(false); }
+  }
+});
+
+/* ============ 3. PASSWORD ============ */
+var COMUNI = ['password', 'qwerty', 'admin', 'login', 'welcome', 'ciao', 'ciaociao', 'juventus', 'inter', 'milan',
+  'napoli', 'roma', 'amore', 'italia', 'letmein', 'iloveyou', 'monkey', 'dragon', 'master', 'abc', 'azerty', 'football'];
+var SEQUENZE = ['123', '234', '345', '456', '567', '678', '789', '890', 'abc', 'qwe', 'asd', 'zxc'];
+
+function normalizza(s) {
+  return s.toLowerCase().replace(/@/g, 'a').replace(/0/g, 'o').replace(/[1!|]/g, 'i')
+    .replace(/3/g, 'e').replace(/\$/g, 's').replace(/5/g, 's').replace(/4/g, 'a').replace(/7/g, 't');
+}
+
+function analizza(p) {
+  var pool = 0;
+  if (/[a-z]/.test(p)) pool += 26;
+  if (/[A-Z]/.test(p)) pool += 26;
+  if (/\d/.test(p)) pool += 10;
+  if (/[^A-Za-z0-9]/.test(p)) pool += 33;
+  var bits = p.length * Math.log(pool || 1) / Math.LN2;
+  var note = [];
+
+  var parole = p.toLowerCase().split(/[^a-z\u00e0-\u00f9]+/).filter(Boolean);
+  var soloParole = /^[a-z\u00e0-\u00f9]+(?:[\s\-_.,][a-z\u00e0-\u00f9]+)+$/.test(p);
+  if (soloParole && parole.length >= 2) {
+    bits = Math.min(bits, parole.length * 13 + (parole.length - 1) * 3);
+    note.push('Sembra una frase di ' + parole.length + ' parole: la forza dipende da quanto le parole sono casuali.');
+  }
+
+  var penalita = 0;
+  SEQUENZE.forEach(function (s) { if (p.toLowerCase().indexOf(s) >= 0) penalita += 8; });
+  if (/(?:19|20)\d{2}/.test(p)) penalita += 8;
+  if (/^(.)\1+$/.test(p)) penalita += 40;
+  if (penalita) { bits = Math.max(0, bits - Math.min(penalita, 24)); note.push('Contiene sequenze o anni facili da indovinare.'); }
+
+  var b = normalizza(p).replace(/[^a-z]/g, '');
+  var comune = COMUNI.some(function (w) { return b.indexOf(w) >= 0; });
+  if (comune) {
+    bits = Math.min(bits, 20);
+    note.push('Contiene una parola molto comune, anche con lettere sostituite da simboli o numeri. Chi prova a indovinare le password ci arriva subito.');
+  }
+  if (p.length < 12) note.push('Ha meno di 12 caratteri.');
+  return { bits: bits, note: note };
+}
+
+function tempo(bits) {
+  var sec = Math.pow(2, Math.max(bits - 1, 0)) / 1e10;
+  if (sec < 1) return 'meno di un secondo';
+  if (sec < 60) return Math.round(sec) + ' secondi';
+  if (sec < 3600) return Math.round(sec / 60) + ' minuti';
+  if (sec < 86400) return Math.round(sec / 3600) + ' ore';
+  if (sec < 31557600) return Math.round(sec / 86400) + ' giorni';
+  var anni = sec / 31557600;
+  if (anni < 1000) return Math.round(anni) + ' anni';
+  if (anni < 1e6) return 'migliaia di anni';
+  if (anni < 1e9) return 'milioni di anni';
+  return 'miliardi di anni o più';
+}
+
+function etichetta(bits) {
+  if (bits < 28) return 'Molto debole';
+  if (bits < 36) return 'Debole';
+  if (bits < 60) return 'Discreta';
+  if (bits < 80) return 'Buona';
+  return 'Ottima';
+}
+
+var pw = document.getElementById('pw');
+pw.addEventListener('input', function () {
+  var p = pw.value;
+  var barra = document.getElementById('barra');
+  var wrap = document.getElementById('barraWrap');
+  var g = document.getElementById('giudizio');
+  var ul = document.getElementById('dettagli');
+  ul.innerHTML = '';
+  if (!p) { barra.style.width = '0'; wrap.setAttribute('aria-valuenow', '0'); g.textContent = 'Scrivi una password per iniziare.'; return; }
+  var r = analizza(p);
+  var perc = Math.min(100, Math.round(r.bits));
+  barra.style.width = perc + '%';
+  wrap.setAttribute('aria-valuenow', String(perc));
+  g.textContent = etichetta(r.bits) + '. Tempo stimato per scoprirla: ' + tempo(r.bits) + '.';
+  var voci = ['Lunghezza: ' + p.length + ' caratteri.'].concat(r.note);
+  voci.forEach(function (t) { var li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+});
+document.getElementById('mostra').addEventListener('change', function (ev) {
+  pw.type = ev.target.checked ? 'text' : 'password';
+});
+</script>
+</body>
+</html>

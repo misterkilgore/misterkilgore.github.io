@@ -1,0 +1,167 @@
+/* Palette consentita: bianco, grigio, verde chiaro, verde scuro */
+:root {
+  --bianco: #ffffff;
+  --grigio: #9d9d9c;
+  --chiaro: #006189;
+  --scuro: #004068;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bianco);
+  color: var(--scuro);
+  font: 1.0625rem/1.65 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+a { color: var(--chiaro); text-underline-offset: 0.15em; }
+a:hover { color: var(--scuro); }
+
+:focus-visible { outline: 3px solid var(--chiaro); outline-offset: 2px; }
+
+.wrap { max-width: 60rem; margin: 0 auto; padding: 0 1.25rem; }
+
+/* Intestazione */
+.site-header { background: var(--scuro); color: var(--bianco); }
+.site-header .wrap {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  align-items: center; gap: 0.5rem 1.5rem; padding-top: 0.8rem; padding-bottom: 0.8rem;
+}
+.site-header a { color: var(--bianco); }
+.site-header :focus-visible { outline-color: var(--bianco); }
+.site-header .corso { font-weight: 600; text-decoration: none; }
+.site-header .posizione { font-size: 0.95rem; }
+
+main { padding: 2rem 0 3rem; }
+
+h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 0.5rem; }
+h2 {
+  font-size: 1.4rem; line-height: 1.3; margin: 2.5rem 0 1rem;
+  padding-bottom: 0.4rem; border-bottom: 2px solid var(--grigio);
+}
+h3 { font-size: 1.12rem; line-height: 1.35; margin: 0 0 0.5rem; }
+p, li { max-width: 70ch; }
+p { margin: 0 0 1rem; }
+.sottotitolo { font-size: 1.15rem; color: var(--chiaro); margin-bottom: 1.5rem; }
+.piccolo { font-size: 0.92rem; }
+
+/* Blocchi */
+.card {
+  border: 1px solid var(--grigio); border-radius: 4px;
+  padding: 1.1rem 1.25rem; background: var(--bianco);
+}
+.card > :last-child { margin-bottom: 0; }
+.griglia {
+  display: grid; gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+.pila > * + * { margin-top: 1rem; }
+
+.nota {
+  border-left: 5px solid var(--chiaro); background: var(--bianco);
+  padding: 0.6rem 1rem; margin: 1.25rem 0;
+  border-top: 1px solid var(--grigio); border-right: 1px solid var(--grigio); border-bottom: 1px solid var(--grigio);
+}
+.nota > :last-child { margin-bottom: 0; }
+.nota.attenzione { border-left-color: var(--scuro); border-left-width: 8px; }
+.nota strong:first-child { color: var(--chiaro); }
+
+/* Card di modulo nell'indice */
+.modulo { display: flex; flex-direction: column; gap: 0.5rem; }
+.modulo .durata { font-size: 0.92rem; color: var(--chiaro); font-weight: 600; margin: 0; }
+.modulo p { margin: 0; }
+.modulo a.vai { margin-top: auto; font-weight: 600; }
+
+/* Pulsanti */
+.btn {
+  display: inline-block; font: inherit; font-weight: 600; cursor: pointer;
+  background: var(--scuro); color: var(--bianco);
+  border: 2px solid var(--scuro); border-radius: 4px;
+  padding: 0.5rem 1rem; text-decoration: none; line-height: 1.3;
+}
+.btn:hover { background: var(--chiaro); border-color: var(--chiaro); color: var(--bianco); }
+.btn.secondario { background: var(--bianco); color: var(--scuro); }
+.btn.secondario:hover { background: var(--bianco); color: var(--chiaro); border-color: var(--chiaro); }
+.btn[disabled] { background: var(--bianco); color: var(--grigio); border-color: var(--grigio); cursor: not-allowed; }
+.btn[aria-pressed="true"], .btn.scelto { background: var(--chiaro); border-color: var(--chiaro); color: var(--bianco); }
+.azioni { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.75rem 0; }
+
+/* Moduli */
+label { display: block; font-weight: 600; margin-bottom: 0.3rem; }
+textarea, input[type="text"], input[type="password"], input[type="file"] {
+  width: 100%; font: inherit; color: var(--scuro); background: var(--bianco);
+  border: 2px solid var(--grigio); border-radius: 4px; padding: 0.5rem 0.65rem;
+}
+textarea { min-height: 9rem; resize: vertical; }
+textarea:focus, input:focus { border-color: var(--chiaro); outline: none; box-shadow: 0 0 0 2px var(--chiaro); }
+textarea[readonly] { border-style: dashed; }
+
+/* Interruttori a "pillola" */
+.scelte { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0; margin: 0.75rem 0; list-style: none; }
+.scelte li { margin: 0; max-width: none; }
+.scelte label {
+  display: flex; align-items: center; gap: 0.5rem; margin: 0; cursor: pointer;
+  border: 2px solid var(--grigio); border-radius: 4px; padding: 0.4rem 0.75rem; font-weight: 400;
+}
+.scelte label:has(input:checked) { background: var(--chiaro); border-color: var(--chiaro); color: var(--bianco); }
+.scelte label:has(input:focus-visible) { outline: 3px solid var(--scuro); outline-offset: 2px; }
+.scelte input { accent-color: var(--scuro); width: 1.1rem; height: 1.1rem; }
+
+/* Dettagli apribili */
+details { border: 1px solid var(--grigio); border-radius: 4px; padding: 0.6rem 1rem; margin: 0.75rem 0; }
+details[open] { border-color: var(--chiaro); }
+summary { cursor: pointer; font-weight: 600; }
+details > :not(summary) { margin-top: 0.75rem; }
+details > :last-child { margin-bottom: 0; }
+
+/* Tabelle */
+.scorri { overflow-x: auto; max-width: 100%; margin: 1rem 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.97rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.75rem; border: 1px solid var(--grigio); }
+th { background: var(--scuro); color: var(--bianco); font-weight: 600; }
+td:first-child { font-weight: 600; }
+
+/* Esiti */
+.esito { margin-top: 0.75rem; padding: 0.6rem 0.9rem; border: 1px solid var(--grigio); border-radius: 4px; }
+.esito.giusto { border-left: 6px solid var(--chiaro); }
+.esito.rivedi { border-left: 6px solid var(--grigio); }
+.esito strong { display: block; }
+.punteggio { font-size: 1.15rem; font-weight: 600; }
+
+/* Misuratore password */
+.misura { height: 0.9rem; background: var(--bianco); border: 1px solid var(--grigio); border-radius: 4px; overflow: hidden; }
+.misura > div { height: 100%; width: 0; background: var(--chiaro); transition: width 0.2s; }
+@media (prefers-reduced-motion: reduce) { .misura > div { transition: none; } }
+
+/* Elenco di verifica */
+.verifica { list-style: none; padding: 0; margin: 0.5rem 0; }
+.verifica li { margin: 0.4rem 0; max-width: none; }
+.verifica label { font-weight: 400; display: flex; gap: 0.6rem; align-items: flex-start; cursor: pointer; }
+.verifica input { accent-color: var(--scuro); width: 1.15rem; height: 1.15rem; margin-top: 0.3rem; flex: none; }
+
+ol.passi { padding-left: 1.4rem; }
+ol.passi li { margin: 0.35rem 0; }
+
+code, .codice {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em;
+  border: 1px solid var(--grigio); border-radius: 3px; padding: 0.05em 0.35em;
+}
+
+/* Navigazione tra moduli */
+.sfoglia { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 3rem; padding-top: 1rem; border-top: 2px solid var(--grigio); }
+
+footer.sito { border-top: 1px solid var(--grigio); padding: 1.25rem 0 2rem; font-size: 0.92rem; }
+
+@media (max-width: 40rem) {
+  h1 { font-size: 1.6rem; }
+  body { font-size: 1rem; }
+}
+
+@media print {
+  .site-header, .sfoglia, .azioni, .btn { display: none; }
+  details { border-color: var(--grigio); }
+  details > * { display: block; }
+}
