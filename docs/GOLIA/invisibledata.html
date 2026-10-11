@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ============================================================
+     QUESTI META TAG SONO ESSI STESSI PARTE DELLA DIMOSTRAZIONE:
+     un'IA li legge prima ancora di eseguire una riga di JavaScript.
+     ============================================================ -->
+<title>Cosa vede un'IA quando visita la tua pagina</title>
+<meta name="description" content="Dimostrazione live di tutti i dati che un'intelligenza artificiale (o qualsiasi client) può raccogliere visitando una pagina web: fingerprinting, API del browser, metadati e inferenze.">
+<meta name="author" content="Demo didattica">
+<meta name="robots" content="index, follow, max-snippet:-1">
+<meta name="generator" content="HTML statico, zero dipendenze">
+<meta name="keywords" content="privacy, fingerprinting, browser fingerprint, dati raccolti, IA, web tracking">
+<link rel="canonical" href="https://example.com/come-ti-vede-una-ia">
+<meta name="theme-color" content="#0a0c10">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cosa vede un'IA quando visita la tua pagina">
+<meta property="og:description" content="Tutti i segnali raccoglibili da una singola visita, misurati dal vivo nel tuo browser.">
+<meta property="og:locale" content="it_IT">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cosa vede un'IA quando visita la tua pagina">
+
+<!-- Dati strutturati -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Cosa vede un'IA quando visita la tua pagina",
+  "inLanguage": "it-IT",
+  "about": ["Browser fingerprinting", "Privacy", "Web API"]
+}
+</script>
+
+<style>
+/* ============================================================
+   VARIABILI E RESET
+   ============================================================ */
+:root{
+  color-scheme: dark;
+  --bg:#0a0c10;
+  --bg-soft:#0f1218;
+  --card:#141821;
+  --card-hi:#181d28;
+  --border:#242b38;
+  --border-hi:#333d4f;
+  --text:#e7ebf2;
+  --muted:#8b95a7;
+  --faint:#5b6474;
+  --accent:#5eead4;
+  --accent-2:#818cf8;
+  --accent-3:#f472b6;
+  --warn:#fbbf24;
+  --danger:#f87171;
+  --ok:#4ade80;
+  --radius:16px;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+
+html{
+  scroll-behavior:smooth;
+  scroll-padding-top:92px;
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.65;
+  overflow-x:hidden;
+}
+
+/* alone di sfondo */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(94,234,212,.10), transparent 60%),
+    radial-gradient(800px 500px at 88% 4%, rgba(129,140,248,.12), transparent 62%),
+    radial-gradient(700px 600px at 50% 110%, rgba(244,114,182,.07), transparent 60%);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;
+  z-index:1;
+  max-width:1180px;
+  margin:0 auto;
+  padding:clamp(48px,8vw,96px) 24px 40px;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:.72rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  border:1px solid rgba(94,234,212,.28);
+  background:rgba(94,234,212,.06);
+  padding:6px 14px;
+  border-radius:999px;
+  margin-bottom:22px;
+}
+.eyebrow::before{
+  content:"";
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 0 rgba(94,234,212,.6);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(94,234,212,.55);}
+  70%{box-shadow:0 0 0 10px rgba(94,234,212,0);}
+  100%{box-shadow:0 0 0 0 rgba(94,234,212,0);}
+}
+
+.hero h1{
+  font-size:clamp(2rem,5.4vw,3.5rem);
+  line-height:1.08;
+  letter-spacing:-.03em;
+  margin:0 0 20px;
+  font-weight:800;
+  background:linear-gradient(120deg,#ffffff 0%,#c9d3e4 40%,var(--accent) 75%,var(--accent-2) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.hero p.lead{
+  font-size:clamp(1rem,1.6vw,1.15rem);
+  color:var(--muted);
+  max-width:70ch;
+  margin:0 0 32px;
+}
+.hero p.lead strong{color:var(--text);font-weight:600;}
+
+.hero-stats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:8px;
+}
+
+.stat{
+  background:linear-gradient(180deg,var(--card-hi),var(--card));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px 20px;
+  min-width:150px;
+  flex:1 1 150px;
+}
+.stat .num{
+  font-family:var(--mono);
+  font-size:1.9rem;
+  font-weight:700;
+  line-height:1;
+  color:var(--accent);
+  display:block;
+  letter-spacing:-.02em;
+}
+.stat .lbl{
+  font-size:.74rem;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  color:var(--faint);
+  margin-top:8px;
+  display:block;
+}
+.stat.purple .num{color:var(--accent-2);}
+.stat.pink .num{color:var(--accent-3);}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.toc{
+  position:sticky;
+  top:0;
+  z-index:50;
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  background:rgba(10,12,16,.78);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.toc::-webkit-scrollbar{display:none;}
+.toc-inner{
+  max-width:1180px;
+  margin:0 auto;
+  padding:0 16px;
+  display:flex;
+  gap:4px;
+  white-space:nowrap;
+}
+.toc a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:.82rem;
+  font-weight:500;
+  padding:14px 12px;
+  border-bottom:2px solid transparent;
+  transition:color .18s, border-color .18s;
+}
+.toc a:hover{color:var(--text);border-bottom-color:var(--accent);}
+
+/* ============================================================
+   SEZIONI E GRIGLIA
+   ============================================================ */
+main{
+  position:relative;
+  z-index:1;
+  max-width:1180px;
+  margin:0 auto;
+  padding:8px 24px 80px;
+}
+
+.section{
+  padding:44px 0 8px;
+  scroll-margin-top:80px;
+}
+
+.sec-head{
+  margin-bottom:22px;
+  max-width:75ch;
+}
+.sec-head h2{
+  font-size:clamp(1.25rem,2.4vw,1.65rem);
+  letter-spacing:-.02em;
+  margin:0 0 8px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.sec-head h2::before{
+  content:"";
+  width:4px;
+  height:1.1em;
+  border-radius:2px;
+  background:linear-gradient(180deg,var(--accent),var(--accent-2));
+  flex:0 0 auto;
+}
+.sec-head p{
+  margin:0 0 0 16px;
+  color:var(--muted);
+  font-size:.92rem;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:16px;
+}
+
+/* ============================================================
+   CARD
+   ============================================================ */
+.card{
+  background:linear-gradient(180deg,var(--card-hi) 0%,var(--card) 100%);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px 18px 14px;
+  position:relative;
+  overflow:hidden;
+  transition:border-color .2s, transform .2s;
+}
+.card::after{
+  content:"";
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(94,234,212,.45),transparent);
+  opacity:0;
+  transition:opacity .25s;
+}
+.card:hover{
+  border-color:var(--border-hi);
+  transform:translateY(-2px);
+}
+.card:hover::after{opacity:1;}
+
+.card-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+.card-head h3{
+  font-size:.95rem;
+  font-weight:700;
+  margin:0;
+  letter-spacing:-.01em;
+  line-height:1.35;
+}
+
+.badge{
+  font-size:.62rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:700;
+  padding:3px 9px;
+  border-radius:999px;
+  white-space:nowrap;
+  flex:0 0 auto;
+  border:1px solid;
+}
+.badge.ident{color:#7dd3fc;border-color:rgba(125,211,252,.3);background:rgba(125,211,252,.08);}
+.badge.hw{color:#a78bfa;border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08);}
+.badge.loc{color:#fcd34d;border-color:rgba(252,211,77,.3);background:rgba(252,211,77,.08);}
+.badge.pref{color:#5eead4;border-color:rgba(94,234,212,.3);background:rgba(94,234,212,.08);}
+.badge.state{color:#f9a8d4;border-color:rgba(249,168,212,.3);background:rgba(249,168,212,.08);}
+.badge.fp{color:#f87171;border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08);}
+.badge.net{color:#93c5fd;border-color:rgba(147,197,253,.3);background:rgba(147,197,253,.08);}
+.badge.meta{color:#86efac;border-color:rgba(134,239,172,.3);background:rgba(134,239,172,.08);}
+.badge.beh{color:#fdba74;border-color:rgba(253,186,116,.3);background:rgba(253,186,116,.08);}
+.badge.srv{color:#c4b5fd;border-color:rgba(196,181,253,.3);background:rgba(196,181,253,.08);}
+
+.why{
+  font-size:.78rem;
+  color:var(--faint);
+  margin:0 0 14px;
+  line-height:1.5;
+  font-style:italic;
+}
+
+.rows{
+  margin:0;
+  display:flex;
+  flex-direction:column;
+}
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:14px;
+  padding:5px 0;
+  border-bottom:1px dashed rgba(36,43,56,.9);
+  font-size:.79rem;
+}
+.row:last-child{border-bottom:none;}
+.row dt{
+  color:var(--muted);
+  flex:0 0 auto;
+  max-width:52%;
+  line-height:1.4;
+}
+.row dd{
+  margin:0;
+  font-family:var(--mono);
+  font-size:.76rem;
+  text-align:right;
+  color:var(--text);
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  line-height:1.45;
+  min-width:0;
+}
+
+.val-ok{color:var(--ok);}
+.val-warn{color:var(--warn);}
+.val-danger{color:var(--danger);}
+.val-dim{color:var(--faint);}
+.null{color:var(--faint);font-style:italic;}
+
+/* ============================================================
+   TABELLE / LISTE SPECIALI
+   ============================================================ */
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+.chip{
+  font-family:var(--mono);
+  font-size:.68rem;
+  padding:3px 8px;
+  border-radius:6px;
+  background:rgba(94,234,212,.07);
+  border:1px solid rgba(94,234,212,.18);
+  color:#a7f3e4;
+}
+.chip.off{
+  background:rgba(139,149,167,.06);
+  border-color:rgba(139,149,167,.16);
+  color:var(--faint);
+  text-decoration:line-through;
+}
+.chip.red{
+  background:rgba(248,113,113,.07);
+  border-color:rgba(248,113,113,.2);
+  color:#fca5a5;
+}
+
+.hash{
+  font-family:var(--mono);
+  font-size:.9rem;
+  color:var(--accent-3);
+  word-break:break-all;
+  display:block;
+  padding:10px 12px;
+  background:rgba(244,114,182,.06);
+  border:1px solid rgba(244,114,182,.18);
+  border-radius:10px;
+  margin-top:6px;
+  letter-spacing:.02em;
+}
+
+/* ============================================================
+   CALLOUT
+   ============================================================ */
+.callout{
+  border-radius:var(--radius);
+  padding:20px 22px;
+  margin:18px 0 0;
+  border:1px solid;
+  font-size:.87rem;
+  line-height:1.65;
+}
+.callout h4{
+  margin:0 0 10px;
+  font-size:.9rem;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+.callout p{margin:0 0 10px;color:var(--muted);}
+.callout p:last-child{margin-bottom:0;}
+.callout ul{margin:0;padding-left:18px;color:var(--muted);}
+.callout li{margin-bottom:7px;}
+.callout li:last-child{margin-bottom:0;}
+.callout strong{color:var(--text);font-weight:600;}
+.callout code{
+  font-family:var(--mono);
+  font-size:.82em;
+  background:rgba(255,255,255,.05);
+  padding:2px 6px;
+  border-radius:5px;
+  color:var(--accent);
+}
+
+.callout.info{
+  background:rgba(129,140,248,.05);
+  border-color:rgba(129,140,248,.2);
+}
+.callout.info h4{color:#a5b4fc;}
+
+.callout.warn{
+  background:rgba(251,191,36,.05);
+  border-color:rgba(251,191,36,.2);
+}
+.callout.warn h4{color:#fcd34d;}
+
+.callout.danger{
+  background:rgba(248,113,113,.05);
+  border-color:rgba(248,113,113,.2);
+}
+.callout.danger h4{color:#fca5a5;}
+
+.callout.good{
+  background:rgba(74,222,128,.05);
+  border-color:rgba(74,222,128,.2);
+}
+.callout.good h4{color:#86efac;}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  position:relative;
+  z-index:1;
+  border-top:1px solid var(--border);
+  margin-top:60px;
+  padding:40px 24px 60px;
+  text-align:center;
+  color:var(--faint);
+  font-size:.82rem;
+}
+footer p{max-width:62ch;margin:0 auto 10px;}
+footer a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--faint);}
+footer a:hover{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:640px){
+  .grid{grid-template-columns:1fr;}
+  main{padding-left:16px;padding-right:16px;}
+  .hero{padding-left:16px;padding-right:16px;}
+  .row{flex-direction:column;align-items:flex-start;gap:2px;}
+  .row dt{max-width:100%;}
+  .row dd{text-align:left;}
+  .stat{min-width:120px;padding:13px 16px;}
+  .stat .num{font-size:1.5rem;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important;}
+  html{scroll-behavior:auto;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero">
+  <span class="eyebrow">Analisi in tempo reale · nessun dato lascia il browser</span>
+  <h1>Cosa vede un'IA<br>quando visita la tua pagina</h1>
+  <p class="lead">
+    Tutto ciò che segue è stato <strong>letto dal vivo nel tuo browser</strong> pochi millisecondi fa,
+    usando solo API web standard, senza cookie, senza server e senza chiederti il permesso.
+    Un'intelligenza artificiale che analizza questa pagina ottiene gli stessi dati — più i metadati
+    testuali, che non hanno bisogno di JavaScript per essere letti.
+  </p>
+
+  <div class="hero-stats">
+    <div class="stat"><span class="num" id="stat-signals">0</span><span class="lbl">Segnali raccolti</span></div>
+    <div class="stat purple"><span class="num" id="stat-entropy">0</span><span class="lbl">Bit di entropia stimati</span></div>
+    <div class="stat pink"><span class="num" id="stat-time">0 ms</span><span class="lbl">Tempo di raccolta</span></div>
+  </div>
+</header>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#client">Client</a>
+    <a href="#hardware">Hardware</a>
+    <a href="#locale">Lingua &amp; Tempo</a>
+    <a href="#preferenze">Preferenze</a>
+    <a href="#stato">Stato &amp; Permessi</a>
+    <a href="#fingerprint">Fingerprint</a>
+    <a href="#rete">Rete</a>
+    <a href="#contenuto">Contenuto</a>
+    <a href="#comportamento">Comportamento</a>
+    <a href="#server">Lato server</a>
+    <a href="#inferenze">Inferenze</a>
+    <a href="#difese">Difese</a>
+  </div>
+</nav>
+
+<!-- ============================================================
+     MAIN — le sezioni vengono popolate via JS
+     ============================================================ -->
+<main id="app"></main>
+
+<footer>
+  <p>
+    <strong>Nessun dato è stato inviato da nessuna parte.</strong>
+    Questa pagina è un singolo file HTML statico: tutta la raccolta avviene localmente nel tuo browser
+    e viene distrutta alla chiusura della scheda.
+  </p>
+  <p>
+    L'obiettivo è rendere visibile ciò che normalmente è invisibile.
+    La consapevolezza è la prima difesa.
+  </p>
+</footer>
+
+<script>
+"use strict";
+
+/* ================================================================
+   0. UTILITÀ
+   ================================================================ */
+
+const app = document.getElementById("app");
+const t0 = performance.now();
+let signalCount = 0;
+
+/* Escape HTML per sicurezza */
+function esc(v){
+  return String(v).replace(/[&<>"']/g, c => (
+    {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]
+  ));
+}
+
+/* Formattazione valore */
+function fmt(v){
+  if (v === undefined || v === null || v === "") return null;
+  if (typeof v === "boolean") return v ? "sì" : "no";
+  if (typeof v === "number") {
+    if (!Number.isFinite(v)) return String(v);
+    return Number.isInteger(v) ? String(v) : v.toFixed(4).replace(/0+$/,"").replace(/\.$/,"");
+  }
+  if (Array.isArray(v)) return v.length ? v.join(", ") : null;
+  return String(v);
+}
+
+/* Crea una sezione e restituisce il contenitore .grid */
+function makeSection(id, title, desc){
+  const sec = document.createElement("section");
+  sec.className = "section";
+  sec.id = id;
+  sec.innerHTML =
+    '<div class="sec-head"><h2>' + esc(title) + '</h2>' +
+    (desc ? '<p>' + desc + '</p>' : '') + '</div>' +
+    '<div class="grid"></div>';
+  app.appendChild(sec);
+  return sec.querySelector(".grid");
+}
+
+/* Crea una card con righe chiave/valore */
+function card(parent, opts){
+  const rows = opts.rows || [];
+  const art = document.createElement("article");
+  art.className = "card";
+
+  let html =
+    '<div class="card-head"><h3>' + esc(opts.title) + '</h3>' +
+    (opts.tag ? '<span class="badge ' + (opts.tagClass || "ident") + '">' + esc(opts.tag) + '</span>' : '') +
+    '</div>';
+
+  if (opts.why) html += '<p class="why">' + opts.why + '</p>';
+
+  if (rows.length){
+    html += '<dl class="rows">';
+    for (const r of rows){
+      const label = r[0];
+      const value = fmt(r[1]);
+      const cls   = r[2] || "";
+      html +=
+        '<div class="row"><dt>' + esc(label) + '</dt><dd class="' + cls + '">' +
+        (value === null ? '<span class="null">non disponibile</span>' : esc(value)) +
+        '</dd></div>';
+      signalCount++;
+    }
+    html += '</dl>';
+  }
+
+  if (opts.after) html += opts.after;
+
+  art.innerHTML = html;
+  parent.appendChild(art);
+  return art;
+}
+
+/* Card con contenuto HTML libero (per dati dinamici) */
+function customCard(parent, title, tag, tagClass, why){
+  const art = document.createElement("article");
+  art.className = "card";
+  art.innerHTML =
+    '<div class="card-head"><h3>' + esc(title) + '</h3>' +
+    (tag ? '<span class="badge ' + tagClass + '">' + esc(tag) + '</span>' : '') +
+    '</div>' + (why ? '<p class="why">' + why + '</p>' : '') +
+    '<dl class="rows"></dl>';
+  parent.appendChild(art);
+  return art.querySelector(".rows");
+}
+
+/* Chips */
+function chips(list, cls){
+  if (!list || !list.length) return "";
+  return '<div class="chips">' +
+    list.map(x => '<span class="chip ' + (cls||"") + '">' + esc(x) + '</span>').join("") +
+    '</div>';
+}
+
+/* ================================================================
+   1. HASH NON CRITTOGRAFICO (per fingerprint compatto)
+   ================================================================ */
+function hashStr(str){
+  let h1 = 0x811c9dc5, h2 = 0x01000193;
+  for (let i = 0; i < str.length; i++){
+    const c = str.charCodeAt(i);
+    h1 ^= c; h1 = Math.imul(h1, 16777619);
+    h2 = Math.imul(h2 ^ c, 2246822519);
+  }
+  return ((h1 >>> 0).toString(16).padStart(8, "0")) +
+         ((h2 >>> 0).toString(16).padStart(8, "0"));
+}
+
+/* ================================================================
+   2. RACCOLTA DATI
+   ================================================================ */
+
+/* ---------- 2.1 Client / User Agent ---------- */
+function collectClient(grid){
+  const ua = navigator.userAgent;
+  const uad = navigator.userAgentData;
+
+  card(grid, {
+    title: "User-Agent completo",
+    tag: "identità",
+    tagClass: "ident",
+    why: "Storicamente il segnale più ricco. Rivela browser, versione, sistema operativo, architettura e — spesso — modello del dispositivo.",
+    rows: [
+      ["Stringa UA", ua, "val-dim"],
+      ["Lunghezza", ua.length],
+      ["Piattaforma dichiarata", navigator.platform],
+      ["Vendor", navigator.vendor],
+      ["Product", navigator.product],
+      ["AppName", navigator.appName],
+      ["AppVersion", navigator.appVersion],
+      ["AppCodeName", navigator.appCodeName],
+      ["Webdriver", navigator.webdriver, navigator.webdriver ? "val-danger" : "val-ok"]
+    ]
+  });
+
+  /* --- Riconoscimento browser/OS dal UA --- */
+  const detect = [];
+  const tests = [
+    ["Chrome",    /Chrome\/([\d.]+)/,      /Edg|OPR/],
+    ["Firefox",   /Firefox\/([\d.]+)/,     null],
+    ["Safari",    /Version\/([\d.]+).*Safari/, /Chrome|Chromium/],
+    ["Edge",      /Edg\/([\d.]+)/,         null],
+    ["Opera",     /OPR\/([\d.]+)/,         null],
+    ["Samsung",   /SamsungBrowser\/([\d.]+)/, null]
+  ];
+  for (const [name, re, anti] of tests){
+    const m = ua.match(re);
+    if (m && (!anti || !anti.test(ua))) detect.push(name + " " + m[1]);
+  }
+  const osList = [];
+  if (/Windows NT 10/.test(ua)) osList.push("Windows 10/11");
+  if (/Windows NT 6\.3/.test(ua)) osList.push("Windows 8.1");
+  if (/Mac OS X ([\d_]+)/.test(ua)) osList.push("macOS " + ua.match(/Mac OS X ([\d_]+)/)[1].replace(/_/g,"."));
+  if (/Android ([\d.]+)/.test(ua)) osList.push("Android " + ua.match(/Android ([\d.]+)/)[1]);
+  if (/iPhone|iPad/.test(ua)) osList.push("iOS");
+  if (/Linux/.test(ua)) osList.push("Linux");
+  if (/CrOS/.test(ua)) osList.push("ChromeOS");
+
+  card(grid, {
+    title: "Interpretazione del client",
+    tag: "derivato",
+    tagClass: "ident",
+    why: "Un'IA non legge la stringa grezza: la interpreta. Da qui ricava il tuo ambiente, e quindi quali vulnerabilità o funzionalità aspettarsi.",
+    rows: [
+      ["Browser rilevati", detect.length ? detect : "non riconosciuto"],
+      ["Sistema operativo", osList.length ? osList : "non riconosciuto"],
+      ["Architettura (UA)", /arm|aarch64/i.test(ua) ? "ARM" : (/x86_64|Win64|x64|WOW64/i.test(ua) ? "x86-64" : "sconosciuta")],
+      ["Dispositivo mobile", /Mobi|Android|iPhone/.test(ua), /Mobi|Android|iPhone/.test(ua) ? "val-warn" : "val-ok"],
+      ["Tablet", /iPad|Tablet/.test(ua)],
+      ["Bot dichiarato", /bot|crawler|spider|headless/i.test(ua), /bot|crawler|spider|headless/i.test(ua) ? "val-danger" : "val-ok"]
+    ]
+  });
+
+  /* --- Client Hints --- */
+  if (uad){
+    const brands = (uad.brands || []).map(b => b.brand + " " + b.version);
+    card(grid, {
+      title: "User-Agent Client Hints",
+      tag: "alta entropia",
+      tagClass: "ident",
+      why: "Sostituto moderno dello User-Agent: strutturato, preciso e — nella versione ad alta entropia — molto più identificante della stringa classica.",
+      rows: [
+        ["Brands", brands],
+        ["Mobile", uad.mobile],
+        ["Platform", uad.platform]
+      ]
+    });
+  }
+
+  /* --- Permessi UA --- */
+  if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues){
+    navigator.userAgentData.getHighEntropyValues(
+      ["architecture","bitness","model","platformVersion","fullVersionList","wow64","formFactors"]
+    ).then(h => {
+      const arts = (h.fullVersionList || []).map(b => b.brand + " " + b.version);
+      card(grid, {
+        title: "Client Hints ad alta entropia",
+        tag: "fingerprint",
+        tagClass: "fp",
+        why: "Questi valori richiedono una chiamata esplicita ma vengono restituiti senza alcun consenso dell'utente nella maggior parte dei browser Chromium.",
+        rows: [
+          ["Architettura", h.architecture],
+          ["Bitness", h.bitness],
+          ["Modello dispositivo", h.model],
+          ["Versione piattaforma", h.platformVersion],
+          ["WOW64", h.wow64],
+          ["Form factors", h.formFactors],
+          ["Versioni complete", arts]
+        ]
+      });
+    }).catch(() => {});
+  }
+
+  /* --- Feature detection --- */
+  const features = {
+    "WebGL": "WebGLRenderingContext" in window,
+    "WebGL2": "WebGL2RenderingContext" in window,
+    "WebGPU": "gpu" in navigator,
+    "WebAssembly": "WebAssembly" in window,
+    "ServiceWorker": "serviceWorker" in navigator,
+    "WebRTC": "RTCPeerConnection" in window,
+    "Bluetooth": "bluetooth" in navigator,
+    "USB": "usb" in navigator,
+    "Serial": "serial" in navigator,
+    "HID": "hid" in navigator,
+    "Gamepad": "getGamepads" in navigator,
+    "SpeechRecognition": "SpeechRecognition" in window || "webkitSpeechRecognition" in window,
+    "SpeechSynthesis": "speechSynthesis" in window,
+    "Notifications": "Notification" in window,
+    "Geolocation": "geolocation" in navigator,
+    "PaymentRequest": "PaymentRequest" in window,
+    "Credentials": "credentials" in navigator,
+    "Share": "share" in navigator,
+    "Vibration": "vibrate" in navigator,
+    "WakeLock": "wakeLock" in navigator,
+    "IdleDetection": "IdleDetector" in window,
+    "ContactsPicker": "contacts" in navigator,
+    "FileSystemAccess": "showOpenFilePicker" in window,
+    "Clipboard": "clipboard" in navigator,
+    "StorageManager": "storage" in navigator,
+    "IndexedDB": "indexedDB" in window,
+    "BroadcastChannel": "BroadcastChannel" in window,
+    "SharedArrayBuffer": "SharedArrayBuffer" in window,
+    "OffscreenCanvas": "OffscreenCanvas" in window,
+    "ResizeObserver": "ResizeObserver" in window,
+    "IntersectionObserver": "IntersectionObserver" in window,
+    "ReportingObserver": "ReportingObserver" in window,
+    "PerformanceObserver": "PerformanceObserver" in window,
+    "VisualViewport": "visualViewport" in window,
+    "CookieStore": "cookieStore" in window,
+    "Scheduler": "scheduler" in window,
+    "CompressionStream": "CompressionStream" in window,
+    "ShowDirectoryPicker": "showDirectoryPicker" in window,
+    "LaunchQueue": "launchQueue" in window,
+    "DocumentPictureInPicture": "documentPictureInPicture" in window,
+    "EyeDropper": "EyeDropper" in window,
+    "NavigatorUAData": "userAgentData" in navigator,
+    "Crypto": "crypto" in window,
+    "SubtleCrypto": !!(window.crypto && crypto.subtle)
+  };
+  const on = Object.keys(features).filter(k => features[k]);
+  const off = Object.keys(features).filter(k => !features[k]);
+
+  signalCount += Object.keys(features).length;
+
+  card(grid, {
+    title: "Feature detection",
+    tag: "impronta API",
+    tagClass: "fp",
+    why: "L'insieme esatto delle API supportate è quasi unico per ogni combinazione browser/versione/SO e viene calcolato in pochi millisecondi.",
+    rows: [["API disponibili", on.length + " / " + Object.keys(features).length]],
+    after:
+      '<div style="margin-top:8px"><div style="font-size:.7rem;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Presenti</div>' +
+      chips(on.slice(0, 40)) +
+      (on.length > 40 ? '<div style="font-size:.72rem;color:var(--faint);margin-top:6px">…e altre ' + (on.length - 40) + '</div>' : '') +
+      '</div>' +
+      '<div style="margin-top:14px"><div style="font-size:.7rem;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Assenti</div>' +
+      chips(off.slice(0, 18), "off") + '</div>'
+  });
+}
+
+/* ---------- 2.2 Hardware ---------- */
+function collectHardware(grid){
+
+  card(grid, {
+    title: "Capacità di calcolo",
+    tag: "hardware",
+    tagClass: "hw",
+    why: "Numero di core e RAM approssimativa permettono di classificare il dispositivo e di distinguerlo da milioni di altri simili.",
+    rows: [
+      ["Core CPU logici", navigator.hardwareConcurrency],
+      ["RAM stimata (GB)", navigator.deviceMemory],
+      ["Punti di contatto max", navigator.maxTouchPoints],
+      ["Touch supportato", "ontouchstart" in window],
+      ["Penna / stilo", "onpointerrawupdate" in window]
+    ]
+  });
+
+  card(grid, {
+    title: "Schermo",
+    tag: "hardware",
+    tagClass: "hw",
+    why: "Risoluzione + densità + profondità colore formano una combinazione altamente distintiva, specialmente su desktop multi-monitor.",
+    rows: [
+      ["Risoluzione", screen.width + " × " + screen.height],
+      ["Area disponibile", screen.availWidth + " × " + screen.availHeight],
+      ["Profondità colore", screen.colorDepth + " bit"],
+      ["Pixel depth", screen.pixelDepth + " bit"],
+      ["Device Pixel Ratio", window.devicePixelRatio],
+      ["Orientamento", screen.orientation ? screen.orientation.type : null],
+      ["Angolo orientamento", screen.orientation ? screen.orientation.angle + "°" : null],
+      ["Risoluzione fisica stimata", Math.round(screen.width * devicePixelRatio) + " × " + Math.round(screen.height * devicePixelRatio)]
+    ]
+  });
+
+  card(grid, {
+    title: "Finestra e viewport",
+    tag: "hardware",
+    tagClass: "hw",
+    why: "Le dimensioni della finestra rivelano abitudini d'uso, presenza di barre laterali, zoom applicato e configurazioni multi-monitor.",
+    rows: [
+      ["Viewport interno", window.innerWidth + " × " + window.innerHeight],
+      ["Finestra esterna", window.outerWidth + " × " + window.outerHeight],
+      ["Posizione finestra", "X " + window.screenX + ", Y " + window.screenY],
+      ["Zoom stimato", (window.outerWidth / window.innerWidth).toFixed(3)],
+      ["Barra strumenti (px)", Math.max(0, window.outerHeight - window.innerHeight)],
+      ["Visual viewport", window.visualViewport
+        ? Math.round(visualViewport.width) + " × " + Math.round(visualViewport.height)
+        : null],
+      ["Scala visual viewport", window.visualViewport ? visualViewport.scale : null]
+    ]
+  });
+
+  /* Batteria */
+  if (navigator.getBattery){
+    navigator.getBattery().then(b => {
+      card(grid, {
+        title: "Stato della batteria",
+        tag: "hardware",
+        tagClass: "hw",
+        why: "Livello e tempo di ricarica sono un identificatore temporaneo sorprendentemente efficace: combaciano con precisione tra due visite ravvicinate.",
+        rows: [
+          ["In carica", b.charging],
+          ["Livello", Math.round(b.level * 100) + "%"],
+          ["Tempo di ricarica", b.chargingTime === Infinity ? "∞" : b.chargingTime + " s"],
+          ["Tempo residuo", b.dischargingTime === Infinity ? "∞" : b.dischargingTime + " s"]
+        ]
+      });
+      signalCount += 4;
+    }).catch(() => {});
+  }
+
+  /* Memoria */
+  if (performance.memory){
+    const m = performance.memory;
+    card(grid, {
+      title: "Memoria JavaScript",
+      tag: "hardware",
+      tagClass: "hw",
+      why: "Il limite di heap assegnato al contesto JS varia con la RAM e l'architettura della macchina.",
+      rows: [
+        ["Limite heap", (m.jsHeapSizeLimit / 1048576).toFixed(1) + " MB"],
+        ["Heap totale", (m.totalJSHeapSize / 1048576).toFixed(2) + " MB"],
+        ["Heap usato", (m.usedJSHeapSize / 1048576).toFixed(2) + " MB"]
+      ]
+    });
+  }
+
+  /* Storage */
+  if (navigator.storage && navigator.storage.estimate){
+    navigator.storage.estimate().then(e => {
+      card(grid, {
+        title: "Quota di archiviazione",
+        tag: "hardware",
+        tagClass: "hw",
+        why: "La quota concessa dipende dallo spazio libero su disco: è un canale indiretto verso lo stato del tuo disco rigido.",
+        rows: [
+          ["Quota totale", (e.quota / 1073741824).toFixed(2) + " GB"],
+          ["Già utilizzata", (e.usage / 1048576).toFixed(3) + " MB"],
+          ["Percentuale usata", ((e.usage / e.quota) * 100).toFixed(4) + "%"],
+          ["Spazio disco stimato", (e.quota / 1073741824 * 2).toFixed(1) + " GB circa"]
+        ]
+      });
+    }).catch(() => {});
+  }
+
+  /* Media devices */
+  if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices){
+    navigator.mediaDevices.enumerateDevices().then(devs => {
+      const kind = k => devs.filter(d => d.kind === k).length;
+      card(grid, {
+        title: "Dispositivi multimediali",
+        tag: "hardware",
+        tagClass: "hw",
+        why: "Anche senza permessi, il numero di webcam e microfoni rivela se sei su un laptop, un desktop, un tablet o un telefono.",
+        rows: [
+          ["Microfoni", kind("audioinput")],
+          ["Altoparlanti / cuffie", kind("audiooutput")],
+          ["Telecamere", kind("videoinput")],
+          ["Totale dispositivi", devs.length],
+          ["Etichette accessibili", devs.some(d => d.label) ? "sì (permesso concesso)" : "no"]
+        ]
+      });
+      signalCount += 5;
+    }).catch(() => {});
+  }
+}
+
+/* ---------- 2.3 Lingua e tempo ---------- */
+function collectLocale(grid){
+  const langs = navigator.languages || [navigator.language];
+  let tz = "sconosciuto", offset = null;
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){}
+  offset = -new Date().getTimezoneOffset();
+
+  card(grid, {
+    title: "Lingua e localizzazione",
+    tag: "locale",
+    tagClass: "loc",
+    why: "La lingua preferita e l'elenco completo delle lingue ordinate per priorità indicano il tuo paese, spesso la tua regione, e a volte l'origine familiare.",
+    rows: [
+      ["Lingua primaria", navigator.language],
+      ["Preferenze complete", langs],
+      ["Numero di lingue", langs.length],
+      ["Lingua normalizzata", langs[0] ? langs[0].split("-")[0] : null],
+      ["Regione dedotta", langs[0] && langs[0].includes("-") ? langs[0].split("-").pop() : null]
+    ]
+  });
+
+  card(grid, {
+    title: "Fuso orario",
+    tag: "locale",
+    tagClass: "loc",
+    why: "Il fuso orario identifica la tua posizione geografica con una precisione che va da poche centinaia a qualche migliaio di chilometri, senza GPS.",
+    rows: [
+      ["Fuso orario IANA", tz],
+      ["Offset UTC", (offset >= 0 ? "+" : "") + Math.floor(offset / 60) + ":" + String(Math.abs(offset % 60)).padStart(2, "0")],
+      ["Offset in minuti", offset],
+      ["Ora locale", new Date().toString()],
+      ["ISO 8601", new Date().toISOString()],
+      ["Ora legale attiva", /GMT[+-][1-9]/.test(new Date().toString())],
+      ["Data di nascita epoch", Date.now()]
+    ]
+  });
+
+  /* Intl resolved options */
+  const intlRows = [];
+  try {
+    const dtf = new Intl.DateTimeFormat().resolvedOptions();
+    intlRows.push(["Locale risolto", dtf.locale]);
+    intlRows.push(["Calendario", dtf.calendar]);
+    intlRows.push(["Sistema numerico", dtf.numberingSystem]);
+    intlRows.push(["Fuso orario", dtf.timeZone]);
+    intlRows.push(["Ciclo orario", dtf.hourCycle]);
+    intlRows.push(["Primo giorno settimana", dtf.weekInfo ? dtf.weekInfo.firstDay : null]);
+  } catch(e){}
+
+  const nf = new Intl.NumberFormat();
+  intlRows.push(["Separatore decimale", nf.format(1.5).includes(",") ? "virgola" : "punto"]);
+  intlRows.push(["Separatore migliaia", nf.format(1234567.89)]);
+  intlRows.push(["Valuta locale", (() => {
+    try { return new Intl.NumberFormat(undefined, {style:"currency", currency: "EUR"}).format(1234.5); }
+    catch(e){ return null; }
+  })()]);
+  intlRows.push(["Data formattata", new Intl.DateTimeFormat().format(new Date())]);
+  intlRows.push(["Data estesa", new Intl.DateTimeFormat(undefined, {dateStyle:"full"}).format(new Date())]);
+  intlRows.push(["Ora formattata", new Intl.DateTimeFormat(undefined, {timeStyle:"long"}).format(new Date())]);
+  intlRows.push(["Ordine data", (() => {
+    const p = new Intl.DateTimeFormat().formatToParts(new Date(2001, 0, 2));
+    return p.filter(x => ["day","month","year"].includes(x.type)).map(x => x.type[0].toUpperCase()).join("-");
+  })()]);
+
+  card(grid, {
+    title: "Internazionalizzazione (Intl)",
+    tag: "locale",
+    tagClass: "loc",
+    why: "Il set di dati ICU del browser determina la formattazione di date, numeri e valute. Piccole differenze rivelano la versione esatta del sistema operativo.",
+    rows: intlRows
+  });
+
+  /* Calendario / data */
+  const now = new Date();
+  card(grid, {
+    title: "Contesto temporale",
+    tag: "locale",
+    tagClass: "loc",
+    why: "L'ora della visita contestualizza il tuo comportamento: lavoro, tempo libero, fuso notturno, giorno feriale o festivo.",
+    rows: [
+      ["Giorno della settimana", now.toLocaleDateString(undefined, {weekday:"long"})],
+      ["Ora del giorno", now.getHours() + ":" + String(now.getMinutes()).padStart(2,"0")],
+      ["Periodo", now.getHours() < 6 ? "notte profonda" : now.getHours() < 12 ? "mattina" : now.getHours() < 18 ? "pomeriggio" : "sera"],
+      ["Giorno dell'anno", Math.ceil((now - new Date(now.getFullYear(),0,0)) / 86400000)],
+      ["Timestamp di avvio pagina", performance.timeOrigin]
+    ]
+  });
+}
+
+/* ---------- 2.4 Preferenze ---------- */
+function collectPreferences(grid){
+  const mq = q => { try { return window.matchMedia(q).matches; } catch(e){ return null; } };
+
+  card(grid, {
+    title: "Aspetto e tema",
+    tag: "preferenze",
+    tagClass: "pref",
+    why: "Le preferenze estetiche del sistema rivelano impostazioni di accessibilità, età approssimativa del dispositivo e configurazioni personalizzate.",
+    rows: [
+      ["Tema scuro preferito", mq("(prefers-color-scheme: dark)")],
+      ["Tema chiaro preferito", mq("(prefers-color-scheme: light)")],
+      ["Nessuna preferenza tema", mq("(prefers-color-scheme: no-preference)")],
+      ["Gamut colore P3", mq("(color-gamut: p3)")],
+      ["Gamut colore sRGB", mq("(color-gamut: srgb)")],
+      ["Dynamic range alto", mq("(dynamic-range: high)")],
+      ["Colori invertiti", mq("(inverted-colors: inverted)")],
+      ["Trasparenza ridotta", mq("(prefers-reduced-transparency: reduce)")],
+      ["Contrasto aumentato", mq("(prefers-contrast: more)")],
+      ["Colori forzati", mq("(forced-colors: active)")]
+    ]
+  });
+
+  card(grid, {
+    title: "Movimento e accessibilità",
+    tag: "preferenze",
+    tagClass: "pref",
+    why: "Ridurre le animazioni è tipico di utenti con disturbi vestibolari o di dispositivi con risparmio energetico. È un segnale demografico indiretto.",
+    rows: [
+      ["Movimento ridotto", mq("(prefers-reduced-motion: reduce)")],
+      ["Movimento consentito", mq("(prefers-reduced-motion: no-preference)")],
+      ["Hover disponibile", mq("(hover: hover)")],
+      ["Hover assente", mq("(hover: none)")],
+      ["Puntatore preciso", mq("(pointer: fine)")],
+      ["Puntatore grossolano", mq("(pointer: coarse)")],
+      ["Puntatore primario", mq("(any-pointer: fine)") ? "fine" : mq("(any-pointer: coarse)") ? "coarse" : "nessuno"],
+      ["Modalità standalone PWA", mq("(display-mode: standalone)")],
+      ["Modalità fullscreen", mq("(display-mode: fullscreen)")],
+      ["Orientamento verticale", mq("(orientation: portrait)")],
+      ["Tema ad alto contrasto forzato", mq("(forced-colors: active)")]
+    ]
+  });
+
+  card(grid, {
+    title: "Preferenze aggiuntive",
+    tag: "preferenze",
+    tagClass: "pref",
+    why: "Ogni media query aggiuntiva restringe il bacino di utenti a cui assomigli, aumentando il potere identificativo della combinazione.",
+    rows: [
+      ["Larghezza minima 1920", mq("(min-width: 1920px)")],
+      ["Larghezza minima 1440", mq("(min-width: 1440px)")],
+      ["Larghezza minima 1024", mq("(min-width: 1024px)")],
+      ["Larghezza massima 640", mq("(max-width: 640px)")],
+      ["Orientamento orizzontale", mq("(orientation: landscape)")],
+      ["Risoluzione 2x", mq("(min-resolution: 2dppx)")],
+      ["Risoluzione 3x", mq("(min-resolution: 3dppx)")],
+      ["Schermo pieghevole", mq("(horizontal-viewport-segments: 2)")],
+      ["Supporto CSS Grid", CSS.supports("display", "grid")],
+      ["Supporto :has()", CSS.supports("selector(:has(*))")],
+      ["Supporto container queries", CSS.supports("container-type", "inline-size")],
+      ["Supporto backdrop-filter", CSS.supports("backdrop-filter", "blur(1px)")],
+      ["Supporto dvh", CSS.supports("height", "100dvh")],
+      ["Supporto animazioni scroll", CSS.supports("animation-timeline", "scroll()")]
+    ]
+  });
+}
+
+/* ---------- 2.5 Stato e permessi ---------- */
+function collectState(grid){
+  let lsOK = false, ssOK = false, idbOK = false, ckOK = false;
+  try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); lsOK = true; } catch(e){}
+  try { sessionStorage.setItem("__t","1"); sessionStorage.removeItem("__t"); ssOK = true; } catch(e){}
+  try { idbOK = !!window.indexedDB; } catch(e){}
+  ckOK = navigator.cookieEnabled;
+
+  card(grid, {
+    title: "Stato del browser",
+    tag: "stato",
+    tagClass: "state",
+    why: "Le modalità private, i blocchi di terze parti e le configurazioni restrittive alterano questi valori: sono un'ulteriore firma del tuo profilo.",
+    rows: [
+      ["Cookie abilitati", ckOK],
+      ["localStorage", lsOK],
+      ["sessionStorage", ssOK],
+      ["IndexedDB", idbOK],
+      ["Service Worker", "serviceWorker" in navigator],
+      ["Contesto sicuro (HTTPS)", window.isSecureContext],
+      ["Isolato cross-origin", window.crossOriginIsolated],
+      ["Online", navigator.onLine],
+      ["Modalità privata sospetta", !lsOK && !ssOK ? "possibile" : "no"],
+      ["Attivazione utente", navigator.userActivation
+        ? (navigator.userActivation.isActive ? "attiva" : "inattiva")
+        : null],
+      ["Attivazione mai avvenuta", navigator.userActivation
+        ? (!navigator.userActivation.hasBeenActive ? "sì" : "no")
+        : null]
+    ]
+  });
+
+  card(grid, {
+    title: "Segnali di privacy",
+    tag: "stato",
+    tagClass: "state",
+    why: "Ironia della sorte: dichiarare di voler proteggere la propria privacy è esso stesso un segnale identificativo, perché solo una minoranza lo fa.",
+    rows: [
+      ["Do Not Track", navigator.doNotTrack],
+      ["Global Privacy Control", navigator.globalPrivacyControl],
+      ["Cookie di terze parti bloccati", !navigator.cookieEnabled],
+      ["Ad blocker rilevato", null],
+      ["Preferenze contrasto", null]
+    ]
+  });
+
+  /* Permessi */
+  if (navigator.permissions && navigator.permissions.query){
+    const names = ["geolocation","notifications","camera","microphone","clipboard-read",
+                   "clipboard-write","midi","background-sync","persistent-storage",
+                   "payment-handler","accelerometer","gyroscope","magnetometer"];
+    const results = [];
+    let pending = names.length;
+
+    names.forEach(n => {
+      navigator.permissions.query({name: n})
+        .then(s => { results.push([n, s.state]); })
+        .catch(() => { results.push([n, "non supportato"]); })
+        .finally(() => {
+          pending--;
+          if (pending === 0){
+            results.sort((a,b) => a[0].localeCompare(b[0]));
+            const map = {granted:"concesso", denied:"negato", prompt:"da chiedere"};
+            card(grid, {
+              title: "Stati dei permessi",
+              tag: "stato",
+              tagClass: "state",
+              why: "Lo stato dei permessi è leggibile senza chiedere nulla. Sapere che hai negato la geolocalizzazione, o che l'hai già concessa altrove, cambia completamente la strategia di un'IA.",
+              rows: results.map(r => [r[0], map[r[1]] || r[1],
+                r[1] === "granted" ? "val-warn" : r[1] === "denied" ? "val-dim" : ""])
+            });
+          }
+        });
+    });
+  }
+}
+
+/* ---------- 2.6 Fingerprinting ---------- */
+async function collectFingerprint(grid){
+
+  const parts = [];
+
+  /* --- Canvas --- */
+  let canvasData = null, canvasHash = null;
+  try {
+    const c = document.createElement("canvas");
+    c.width = 300; c.height = 70;
+    const ctx = c.getContext("2d");
+    ctx.textBaseline = "top";
+    ctx.font = '16px "Arial"';
+    ctx.fillStyle = "#f60";
+    ctx.fillRect(0, 0, 300, 70);
+    ctx.fillStyle = "#069";
+    ctx.fillText("Impronta digitale 👋 你好 éàü", 4, 4);
+    ctx.fillStyle = "rgba(102,204,0,0.7)";
+    ctx.fillText("Impronta digitale 👋 你好 éàü", 6, 24);
+    ctx.beginPath();
+    ctx.arc(180, 48, 18, 0, Math.PI * 2, true);
+    ctx.fillStyle = "rgba(255,0,255,0.4)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,255,0.6)";
+    ctx.stroke();
+    ctx.font = "italic 11pt Georgia";
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    ctx.fillText("μῆνιν ἄειδε θεά", 60, 50);
+    canvasData = c.toDataURL();
+    canvasHash = hashStr(canvasData);
+    parts.push("canvas:" + canvasHash);
+  } catch(e){}
+
+  card(grid, {
+    title: "Impronta Canvas",
+    tag: "fingerprint",
+    tagClass: "fp",
+    why: "Il rendering di testo e forme dipende da GPU, driver, font installati e antialiasing. Il risultato è un hash che identifica la tua macchina con precisione quasi univoca.",
+    rows: [
+      ["Hash canvas", canvasHash],
+      ["Dimensione PNG generato", canvasData ? canvasData.length + " caratteri" : null],
+      ["Tipo immagine", canvasData ? canvasData.slice(5, 15).replace(";base64","") : null],
+      ["Canvas 2D disponibile", !!canvasData]
+    ]
+  });
+
+  /* --- WebGL --- */
+  let glInfo = null;
+  try {
+    const c = document.createElement("canvas");
+    const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+    if (gl){
+      const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+      glInfo = {
+        vendor: dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
+        renderer: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
+        version: gl.getParameter(gl.VERSION),
+        glsl: gl.getParameter(gl.SHADING_LANGUAGE_VERSION),
+        maxTexture: gl.getParameter(gl.MAX_TEXTURE_SIZE),
+        maxViewport: gl.getParameter(gl.MAX_VIEWPORT_DIMS),
+        extCount: (gl.getSupportedExtensions() || []).length,
+        extensions: (gl.getSupportedExtensions() || []).slice(0, 12),
+        maxRenderbuffer: gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),
+        aliasedLine: gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE),
+        maxVertexAttribs: gl.getParameter(gl.MAX_VERTEX_ATTRIBS),
+        maxTextureUnits: gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS)
+      };
+      parts.push("gl:" + glInfo.vendor + "|" + glInfo.renderer);
+    }
+  } catch(e){}
+
+  if (glInfo){
+    card(grid, {
+      title: "WebGL — scheda grafica",
+      tag: "fingerprint",
+      tagClass: "fp",
+      why: "Il nome esatto della GPU è uno dei segnali più identificanti in assoluto. Spesso rivela il modello del portatile, se hai una eGPU o se sei in una macchina virtuale.",
+      rows: [
+        ["Vendor GPU", glInfo.vendor],
+        ["Renderer GPU", glInfo.renderer],
+        ["Versione WebGL", glInfo.version],
+        ["Versione GLSL", glInfo.glsl],
+        ["Estensioni disponibili", glInfo.extCount + " (elenco sotto)"],
+        ["Texture massima", glInfo.maxTexture + " px"],
+        ["Viewport massimo", glInfo.maxViewport ? glInfo.maxViewport[0] + " × " + glInfo.maxViewport[1] : null],
+        ["Renderbuffer massimo", glInfo.maxRenderbuffer],
+        ["Unità texture", glInfo.maxTextureUnits],
+        ["Attributi vertice", glInfo.maxVertexAttribs],
+        ["Larghezza linea", glInfo.aliasedLine ? glInfo.aliasedLine[0] + "–" + glInfo.aliasedLine[1] : null]
+      ],
+      after: '<div style="margin-top:10px">' + chips(glInfo.extensions) + '</div>'
+    });
+  }
+
+  /* --- WebGPU --- */
+  if (navigator.gpu && navigator.gpu.requestAdapter){
+    try {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (adapter){
+        const info = adapter.info || (adapter.requestAdapterInfo ? await adapter.requestAdapterInfo() : null);
+        card(grid, {
+          title: "WebGPU — adattatore",
+          tag: "fingerprint",
+          tagClass: "fp",
+          why: "Nuova API, nuovo canale di fingerprinting. Espone vendor e architettura della GPU in modo ancora più esplicito di WebGL.",
+          rows: [
+            ["Vendor", info ? info.vendor : "nascosto"],
+            ["Architettura", info ? info.architecture : "nascosto"],
+            ["Device", info ? info.device : "nascosto"],
+            ["Descrizione", info ? info.description : "nascosto"],
+            ["Limiti texture 2D", adapter.limits ? adapter.limits.maxTextureDimension2D : null],
+            ["Max buffer", adapter.limits ? (adapter.limits.maxBufferSize / 1048576).toFixed(0) + " MB" : null],
+            ["Caratteristiche", adapter.features ? adapter.features.size : null]
+          ]
+        });
+      }
+    } catch(e){}
+  }
+
+  /* --- Audio --- */
+  let audioHash = null;
+  try {
+    const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    if (AC){
+      const ctx = new AC(1, 44100, 44100);
+      const osc = ctx.createOscillator();
+      osc.type = "triangle";
+      osc.frequency.value = 10000;
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -50;
+      comp.knee.value = 40;
+      comp.ratio.value = 12;
+      comp.attack.value = 0;
+      comp.release.value = 0.25;
+      osc.connect(comp);
+      comp.connect(ctx.destination);
+      osc.start(0);
+      const buf = await ctx.startRendering();
+      const data = buf.getChannelData(0);
+      let sum = 0;
+      for (let i = 4500; i < 5000; i++) sum += Math.abs(data[i]);
+      audioHash = hashStr(sum.toString());
+      parts.push("audio:" + audioHash);
+    }
+  } catch(e){}
+
+  card(grid, {
+    title: "Impronta Audio",
+    tag: "fingerprint",
+    tagClass: "fp",
+    why: "L'elaborazione di un segnale audio passa attraverso lo stack audio del sistema operativo. Piccole differenze nei campioni prodotti identificano la piattaforma.",
+    rows: [
+      ["Hash audio", audioHash],
+      ["Contesto audio disponibile", !!audioHash],
+      ["Sample rate", (() => {
+        try { return new AudioContext().sampleRate + " Hz"; } catch(e){ return null; }
+      })()],
+      ["Canali massimi", (() => {
+        try { return new AudioContext().destination.maxChannelCount; } catch(e){ return null; }
+      })()]
+    ]
+  });
+
+  /* --- Font --- */
+  const fontList = [
+    "Arial","Arial Black","Arial Narrow","Bahnschrift","Calibri","Cambria","Candara",
+    "Comic Sans MS","Consolas","Constantia","Corbel","Courier New","Ebrima",
+    "Franklin Gothic Medium","Gabriola","Gadugi","Georgia","Impact","Ink Free",
+    "Javanese Text","Leelawadee UI","Lucida Console","Lucida Sans Unicode",
+    "Malgun Gothic","Marlett","Microsoft Himalaya","Microsoft JhengHei",
+    "Microsoft New Tai Lue","Microsoft PhagsPa","Microsoft Sans Serif",
+    "Microsoft Tai Le","Microsoft YaHei","Microsoft Yi Baiti","MingLiU-ExtB",
+    "Mongolian Baiti","MS Gothic","MV Boli","Myanmar Text","Nirmala UI",
+    "Palatino Linotype","Segoe MDL2 Assets","Segoe Print","Segoe Script",
+    "Segoe UI","Segoe UI Emoji","Segoe UI Historic","Segoe UI Symbol","SimSun",
+    "Sitka","Sylfaen","Symbol","Tahoma","Times New Roman","Trebuchet MS","Verdana",
+    "Webdings","Wingdings","Yu Gothic",
+    "Helvetica","Helvetica Neue","Menlo","Monaco","Optima","Futura","Gill Sans",
+    "Baskerville","Hoefler Text","Avenir","Avenir Next","Geneva","Lucida Grande",
+    "PingFang SC","Hiragino Sans","Apple Color Emoji","Zapfino","Copperplate",
+    "Chalkboard","Papyrus","Skia","Didot","American Typewriter",
+    "Ubuntu","Cantarell","DejaVu Sans","Liberation Sans","Noto Sans",
+    "FreeSans","Nimbus Sans","Droid Sans","Roboto","Open Sans","Lato",
+    "Fira Sans","Source Sans Pro","Inter","JetBrains Mono","Fira Code",
+    "Cascadia Code","Cascadia Mono"
+  ];
+
+  function detectFonts(list){
+    const base = ["monospace","sans-serif","serif"];
+    const span = document.createElement("span");
+    span.style.cssText =
+      "position:absolute;left:-9999px;top:-9999px;font-size:72px;line-height:normal;" +
+      "white-space:nowrap;visibility:hidden;";
+    span.textContent = "mmmmmmmmmmlli";
+    document.body.appendChild(span);
+
+    const baseSizes = {};
+    for (const b of base){
+      span.style.fontFamily = b;
+      baseSizes[b] = span.offsetWidth;
+    }
+
+    const found = [];
+    for (const f of list){
+      let hit = false;
+      for (const b of base){
+        span.style.fontFamily = "'" + f + "'," + b;
+        if (span.offsetWidth !== baseSizes[b]){ hit = true; break; }
+      }
+      if (hit) found.push(f);
+    }
+    span.remove();
+    return found;
+  }
+
+  const fonts = detectFonts(fontList);
+  parts.push("fonts:" + fonts.length + ":" + hashStr(fonts.join(",")));
+
+  card(grid, {
+    title: "Font installati",
+    tag: "fingerprint",
+    tagClass: "fp",
+    why: "L'insieme esatto dei font è una delle impronte più stabili e identificanti. Cambia raramente e distingue in modo netto sistemi operativi, lingue e software installato.",
+    rows: [
+      ["Font rilevati", fonts.length + " su " + fontList.length + " testati"],
+      ["Hash dell'insieme", hashStr(fonts.join(","))],
+      ["Famiglia dominante", fonts.includes("Segoe UI") ? "Windows" : fonts.includes("Helvetica Neue") || fonts.includes("SF Pro Text") ? "macOS / iOS" : fonts.includes("Ubuntu") || fonts.includes("Cantarell") ? "Linux / GNOME" : "non determinata"]
+    ],
+    after: '<div style="margin-top:10px">' + chips(fonts.slice(0, 34)) + '</div>' +
+      (fonts.length > 34 ? '<div style="font-size:.72rem;color:var(--faint);margin-top:6px">…e altri ' + (fonts.length - 34) + ' font</div>' : '')
+  });
+
+  /* --- Precisione matematica --- */
+  const mathSig = [
+    Math.tan(-1e300).toString(),
+    Math.sinh(1).toString(),
+    Math.cosh(10).toString(),
+    Math.expm1(1).toString(),
+    (Math.acosh(1e300)).toString(),
+    Math.pow(Math.PI, -100).toString(),
+    Math.atan2(1, 3).toString(),
+    Math.log1p(1e-15).toString(),
+    (1 / 3).toString(),
+    Math.fround(5.5).toString()
+  ].join("|");
+
+  card(grid, {
+    title: "Precisione matematica",
+    tag: "fingerprint",
+    tagClass: "fp",
+    why: "Le funzioni trascendenti di JavaScript non sono specificate bit per bit: ogni motore JS, e a volte ogni architettura, produce risultati leggermente diversi.",
+    rows: [
+      ["Hash dei risultati", hashStr(mathSig)],
+      ["tan(-1e300)", Math.tan(-1e300)],
+      ["sinh(1)", Math.sinh(1)],
+      ["acosh(1e300)", Math.acosh(1e300)],
+      ["expm1(1)", Math.expm1(1)],
+      ["pow(π, -100)", Math.pow(Math.PI, -100)],
+      ["1/3", 1/3],
+      ["fround(5.5)", Math.fround(5.5)]
+    ]
+  });
+
+  /* --- Rendering emoji --- */
+  const emojiTest = ["😀","👋","🇮🇹","👨‍👩‍👧‍👦","🏳️‍🌈","☺️"];
+  const emojiWidths = (() => {
+    const span = document.createElement("span");
+    span.style.cssText = "position:absolute;left:-9999px;font-size:32px;visibility:hidden;";
+    document.body.appendChild(span);
+    const w = emojiTest.map(e => { span.textContent = e; return span.offsetWidth; });
+    span.remove();
+    return w;
+  })();
+
+  card(grid, {
+    title: "Rendering emoji",
+    tag: "fingerprint",
+    tagClass: "fp",
+    why: "Il set di emoji installato cambia con la versione del sistema. Le larghezze misurate distinguono Windows 10 da 11, iOS da Android, e persino vecchie versioni.",
+    rows: [
+      ["Hash larghezze", hashStr(emojiWidths.join(","))],
+      ["Larghezze (px)", emojiWidths.join(" / ")],
+      ["Set emoji stimato", /Windows/.test(uaGlobal) ? "Segoe UI Emoji" : /Mac|iPhone|iPad/.test(uaGlobal) ? "Apple Color Emoji" : "Noto Color Emoji (probabile)"]
+    ]
+  });
+
+  /* --- Media queries di risoluzione --- */
+  const dprTests = [];
+  for (let d = 1; d <= 4; d += 0.5){
+    if (window.matchMedia("(resolution: " + d + "dppx)").matches) dprTests.push(d + "x");
+  }
+
+  /* --- Firma complessiva --- */
+  parts.push(
+    "ua:" + navigator.userAgent,
+    "lang:" + navigator.language,
+    "tz:" + (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){ return "?"; } })(),
+    "screen:" + screen.width + "x" + screen.height + "x" + screen.colorDepth,
+    "dpr:" + devicePixelRatio,
+    "cores:" + navigator.hardwareConcurrency,
+    "mem:" + navigator.deviceMemory,
+    "plat:" + navigator.platform,
+    "touch:" + navigator.maxTouchPoints
+  );
+
+  const masterHash = hashStr(parts.join("||"));
+
+  const masterCard = document.createElement("article");
+  masterCard.className = "card";
+  masterCard.style.gridColumn = "1 / -1";
+  masterCard.innerHTML =
+    '<div class="card-head"><h3>Firma digitale complessiva</h3>' +
+    '<span class="badge fp">identificatore</span></div>' +
+    '<p class="why">Combinando tutti i segnali stabili raccolti sopra si ottiene un identificatore che, nella pratica, ' +
+    'resta invariato per mesi e distingue il tuo dispositivo da centinaia di migliaia di altri. Non serve alcun cookie: ' +
+    'basta ricalcolarlo a ogni visita.</p>' +
+    '<span class="hash">' + masterHash + '</span>' +
+    '<dl class="rows" style="margin-top:14px">' +
+      '<div class="row"><dt>Componenti usati nella firma</dt><dd>' + parts.length + '</dd></div>' +
+      '<div class="row"><dt>Stabilità stimata</dt><dd class="val-warn">settimane / mesi</dd></div>' +
+      '<div class="row"><dt>Unicità stimata</dt><dd class="val-danger">alta (1 su decine di migliaia)</dd></div>' +
+      '<div class="row"><dt>Persistenza dopo cancellazione cookie</dt><dd class="val-danger">sì</dd></div>' +
+      '<div class="row"><dt>Funziona in navigazione privata</dt><dd class="val-danger">sì, con variazioni minime</dd></div>' +
+    '</dl>';
+  grid.appendChild(masterCard);
+  signalCount += 5;
+
+  updateStats(masterHash, parts.length);
+}
+
+/* ---------- 2.7 Rete ---------- */
+function collectNetwork(grid){
+  card(grid, {
+    title: "Connessione di rete",
+    tag: "rete",
+    tagClass: "net",
+    why: "Il tipo di connessione e la latenza stimata rivelano se sei a casa, in ufficio, in mobilità o su una VPN lenta. È un contesto, non solo un dato tecnico.",
+    rows: [
+      ["Online", navigator.onLine],
+      ["Tipo effettivo", navigator.connection ? navigator.connection.effectiveType : null],
+      ["Downlink stimato", navigator.connection ? navigator.connection.downlink + " Mbps" : null],
+      ["RTT stimato", navigator.connection ? navigator.connection.rtt + " ms" : null],
+      ["Risparmio dati", navigator.connection ? navigator.connection.saveData : null],
+      ["Tipo fisico", navigator.connection && navigator.connection.type ? navigator.connection.type : null]
+    ]
+  });
+
+  card(grid, {
+    title: "Contesto della visita",
+    tag: "rete",
+    tagClass: "net",
+    why: "Da dove sei arrivato è spesso più informativo di chi sei: dice cosa stavi cercando e perché sei finito qui.",
+    rows: [
+      ["URL completo", location.href],
+      ["Protocollo", location.protocol],
+      ["Host", location.host],
+      ["Path", location.pathname],
+      ["Query string", location.search || "nessuna"],
+      ["Parametri", location.search
+        ? [...new URLSearchParams(location.search).entries()].map(([k,v]) => k + "=" + v)
+        : null],
+      ["Hash", location.hash || "nessuno"],
+      ["Referrer", document.referrer || "diretto (nessun referrer)"],
+      ["Referrer esterno", document.referrer && !document.referrer.includes(location.host)
+        ? "sì — provenienza: " + (() => { try { return new URL(document.referrer).hostname; } catch(e){ return "?"; } })()
+        : "no"],
+      ["Profondità cronologia", history.length],
+      ["Titolo documento", document.title],
+      ["Stato documento", document.readyState],
+      ["Charset", document.characterSet],
+      ["Content-Type", document.contentType],
+      ["Compat mode", document.compatMode],
+      ["Lingua del documento", document.documentElement.lang || "non dichiarata"]
+    ]
+  });
+
+  /* Timing di rete reale */
+  const nav = performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
+  if (nav){
+    card(grid, {
+      title: "Timing di caricamento",
+      tag: "rete",
+      tagClass: "net",
+      why: "I tempi di risposta rivelano la qualità della tua linea, la distanza dai server e persino se stai usando una VPN o Tor.",
+      rows: [
+        ["Tipo di navigazione", nav.type],
+        ["DNS", Math.round(nav.domainLookupEnd - nav.domainLookupStart) + " ms"],
+        ["Connessione TCP", Math.round(nav.connectEnd - nav.connectStart) + " ms"],
+        ["TLS", nav.secureConnectionStart ? Math.round(nav.connectEnd - nav.secureConnectionStart) + " ms" : null],
+        ["TTFB", Math.round(nav.responseStart - nav.requestStart) + " ms"],
+        ["Download risposta", Math.round(nav.responseEnd - nav.responseStart) + " ms"],
+        ["DOM interattivo", Math.round(nav.domInteractive) + " ms"],
+        ["DOM completo", Math.round(nav.domComplete) + " ms"],
+        ["Load totale", Math.round(nav.loadEventEnd) + " ms"],
+        ["Trasferimento", nav.transferSize ? (nav.transferSize / 1024).toFixed(1) + " KB" : null],
+        ["Protocollo", nav.nextHopProtocol || null]
+      ]
+    });
+  }
+}
+
+/* ---------- 2.8 Contenuto della pagina ---------- */
+function collectContent(grid){
+  const q = s => document.querySelector(s);
+  const qa = s => [...document.querySelectorAll(s)];
+
+  const metaTags = qa("meta").map(m => {
+    const k = m.getAttribute("name") || m.getAttribute("property") || m.getAttribute("http-equiv");
+    return k ? k : null;
+  }).filter(Boolean);
+
+  const links = qa("a[href]");
+  const external = links.filter(a => { try { return new URL(a.href).host !== location.host; } catch(e){ return false; } });
+  const images = qa("img");
+  const noAlt = images.filter(i => !i.hasAttribute("alt"));
+  const headings = qa("h1,h2,h3,h4,h5,h6");
+  const text = (document.body.innerText || "").trim();
+  const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+
+  card(grid, {
+    title: "Metadati del documento",
+    tag: "contenuto",
+    tagClass: "meta",
+    why: "Un'IA legge questi elementi prima di qualsiasi script. Descrivono la pagina, il suo autore, la sua lingua e il suo scopo dichiarato.",
+    rows: [
+      ["Title", document.title],
+      ["Meta description", q('meta[name="description"]') ? q('meta[name="description"]').content : null],
+      ["Meta keywords", q('meta[name="keywords"]') ? q('meta[name="keywords"]').content : null],
+      ["Autore", q('meta[name="author"]') ? q('meta[name="author"]').content : null],
+      ["Robots", q('meta[name="robots"]') ? q('meta[name="robots"]').content : null],
+      ["Generator", q('meta[name="generator"]') ? q('meta[name="generator"]').content : null],
+      ["Canonical", q('link[rel="canonical"]') ? q('link[rel="canonical"]').href : null],
+      ["Theme color", q('meta[name="theme-color"]') ? q('meta[name="theme-color"]').content : null],
+      ["Open Graph", qa('meta[property^="og:"]').map(m => m.getAttribute("property").replace("og:","")).join(", ") || null],
+      ["Twitter Card", qa('meta[name^="twitter:"]').map(m => m.getAttribute("name").replace("twitter:","")).join(", ") || null],
+      ["Dati strutturati JSON-LD", qa('script[type="application/ld+json"]').length + " blocchi"],
+      ["Totale meta tag", metaTags.length],
+      ["Favicon", q('link[rel*="icon"]') ? q('link[rel*="icon"]').href : null]
+    ]
+  });
+
+  card(grid, {
+    title: "Struttura e testo",
+    tag: "contenuto",
+    tagClass: "meta",
+    why: "Il testo è il contenuto che un'IA elabora davvero: da qui deduce argomento, tono, pubblico target, competenza e intento.",
+    rows: [
+      ["Conteggio parole", words],
+      ["Tempo di lettura", Math.ceil(words / 220) + " min"],
+      ["Caratteri di testo", text.length],
+      ["Titoli totali", headings.length],
+      ["H1", qa("h1").map(h => h.textContent.trim().slice(0, 60))],
+      ["H2", qa("h2").map(h => h.textContent.trim().slice(0, 60))],
+      ["Paragrafi", qa("p").length],
+      ["Liste", qa("ul,ol").length],
+      ["Tabelle", qa("table").length],
+      ["Codice", qa("code,pre").length],
+      ["Elementi totali nel DOM", document.getElementsByTagName("*").length],
+      ["Profondità massima DOM", (() => {
+        let max = 0;
+        const walk = (el, d) => { max = Math.max(max, d); for (const c of el.children) walk(c, d + 1); };
+        walk(document.documentElement, 0);
+        return max;
+      })()]
+    ]
+  });
+
+  card(grid, {
+    title: "Risorse e collegamenti",
+    tag: "contenuto",
+    tagClass: "meta",
+    why: "Le risorse esterne caricate rivelano il tuo stack tecnologico, i tuoi fornitori, i tuoi tracker e la tua infrastruttura.",
+    rows: [
+      ["Link totali", links.length],
+      ["Link esterni", external.length],
+      ["Host esterni", [...new Set(external.map(a => { try { return new URL(a.href).host; } catch(e){ return null; } }).filter(Boolean))]],
+      ["Immagini", images.length],
+      ["Immagini senza alt", noAlt.length + (noAlt.length ? " ⚠" : "")],
+      ["Iframe", qa("iframe").length],
+      ["Script", qa("script").length],
+      ["Fogli di stile", qa('link[rel="stylesheet"]').length],
+      ["Form", qa("form").length],
+      ["Campi input", qa("input,textarea,select").length],
+      ["Elementi video/audio", qa("video,audio").length],
+      ["Elementi canvas", qa("canvas").length],
+      ["Elementi SVG", qa("svg").length],
+      ["Web Components", qa("*").filter(e => e.tagName.includes("-")).length]
+    ]
+  });
+
+  /* Commenti HTML — spesso contengono informazioni dimenticate */
+  const comments = [];
+  try {
+    const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_COMMENT);
+    let node;
+    while ((node = walker.nextNode()) && comments.length < 20){
+      const t = node.textContent.trim();
+      if (t.length > 3) comments.push(t.slice(0, 90));
+    }
+  } catch(e){}
+
+  if (comments.length){
+    card(grid, {
+      title: "Commenti HTML esposti",
+      tag: "contenuto",
+      tagClass: "meta",
+      why: "I commenti nel sorgente sono visibili a chiunque. Spesso contengono note di sviluppo, TODO, credenziali dimenticate o informazioni sull'infrastruttura.",
+      rows: comments.map((c, i) => ["#" + (i + 1), c])
+    });
+  }
+}
+
+/* ---------- 2.9 Comportamento ---------- */
+function collectBehavior(grid){
+  const rows = customCard(
+    grid,
+    "Tracciamento comportamentale live",
+    "live",
+    "beh",
+    "Questa card si aggiorna in tempo reale mentre interagisci con la pagina. È esattamente ciò che fanno gli script di analytics: " +
+    "non ti identificano con un cookie, ti identificano con il tuo comportamento."
+  );
+
+  const addRow = (id, label) => {
+    const d = document.createElement("div");
+    d.className = "row";
+    d.innerHTML = '<dt>' + esc(label) + '</dt><dd id="' + id + '">—</dd>';
+    rows.appendChild(d);
+    signalCount++;
+    return document.getElementById(id);
+  };
+
+  const elTime    = addRow("beh-time", "Tempo sulla pagina");
+  const elScroll  = addRow("beh-scroll", "Profondità di scroll massima");
+  const elScrollN = addRow("beh-scrolln", "Scroll totali");
+  const elMouse   = addRow("beh-mouse", "Movimenti del mouse");
+  const elClicks  = addRow("beh-clicks", "Clic registrati");
+  const elKeys    = addRow("beh-keys", "Tasti premuti (solo conteggio)");
+  const elFocus   = addRow("beh-focus", "Perdite di focus");
+  const elSel     = addRow("beh-sel", "Selezioni di testo");
+  const elCopy    = addRow("beh-copy", "Copie negli appunti");
+  const elVel     = addRow("beh-vel", "Velocità di scroll");
+  const elIdle    = addRow("beh-idle", "Inattività corrente");
+
+  let maxScroll = 0, scrollCount = 0, mouse = 0, clicks = 0, keys = 0,
+      blurs = 0, sels = 0, copies = 0, lastY = window.scrollY, lastT = Date.now(),
+      lastActivity = Date.now(), velocity = 0;
+
+  const start = Date.now();
+
+  const update = () => {
+    const now = Date.now();
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? Math.min(100, Math.round((window.scrollY / h) * 100)) : 100;
+    if (pct > maxScroll) maxScroll = pct;
+
+    const dt = Math.max(1, now - lastT);
+    const dy = Math.abs(window.scrollY - lastY);
+    if (dy > 0) velocity = Math.round((dy / dt) * 1000);
+    lastY = window.scrollY;
+    lastT = now;
+
+    elTime.textContent    = ((now - start) / 1000).toFixed(1) + " s";
+    elScroll.textContent  = maxScroll + "%";
+    elScrollN.textContent = scrollCount;
+    elMouse.textContent   = mouse;
+    elClicks.textContent  = clicks;
+    elKeys.textContent    = keys;
+    elFocus.textContent   = blurs;
+    elSel.textContent     = sels;
+    elCopy.textContent    = copies;
+    elVel.textContent     = velocity + " px/s";
+    elIdle.textContent    = ((now - lastActivity) / 1000).toFixed(1) + " s";
+  };
+
+  window.addEventListener("scroll", () => { scrollCount++; lastActivity = Date.now(); }, {passive:true});
+  window.addEventListener("mousemove", () => { mouse++; lastActivity = Date.now(); }, {passive:true});
+  window.addEventListener("click", () => { clicks++; lastActivity = Date.now(); }, {passive:true});
+  window.addEventListener("keydown", () => { keys++; lastActivity = Date.now(); }, {passive:true});
+  window.addEventListener("blur", () => { blurs++; });
+  document.addEventListener("selectionchange", () => { sels++; });
+  document.addEventListener("copy", () => { copies++; lastActivity = Date.now(); });
+
+  setInterval(update, 500);
+  update();
+}
+
+/* ---------- 2.10 Lato server ---------- */
+function collectServer(grid){
+  const serverRows = [
+    ["Indirizzo IP pubblico", "visibile al server, non a JavaScript"],
+    ["IPv6", "se disponibile, spesso più stabile dell'IPv4"],
+    ["Geolocalizzazione IP", "città, regione, paese, ISP, ASN"],
+    ["User-Agent (header)", "inviato a ogni richiesta, anche senza JS"],
+    ["Accept-Language", "le tue lingue, inviate a ogni richiesta"],
+    ["Referer", "la pagina da cui sei arrivato"],
+    ["Cookie inviati", "tutti i cookie del dominio"],
+    ["Header Accept", "capacità dichiarate del client"],
+    ["Header Sec-CH-UA", "Client Hints nella richiesta iniziale"],
+    ["Header DNT / Sec-GPC", "le tue preferenze di privacy dichiarate"],
+    ["Header Sec-Fetch-*", "come e perché è avvenuta la richiesta"],
+    ["TLS Fingerprint (JA3/JA4)", "impronta del tuo stack TLS, molto stabile"],
+    ["HTTP/2 Fingerprint", "ordine e valori dei frame, tecnica Akamai"],
+    ["Ordine degli header", "spesso unico per browser e versione"],
+    ["Data e ora della richiesta", "con precisione al millisecondo"],
+    ["Metodo e percorso", "cosa hai chiesto esattamente"],
+    ["Catena di redirect", "da dove sei passato prima"],
+    ["Timing della connessione", "velocità e latenza della tua linea"],
+    ["Dimensione delle richieste", "indirettamente, la tua connettività"],
+    ["Porta sorgente", "a volte utilizzabile come segnale"],
+    ["Reverse DNS", "a volte rivela organizzazione o ISP aziendale"],
+    ["Reputazione IP", "VPN, Tor, proxy, datacenter, residenziale"]
+  ];
+
+  card(grid, {
+    title: "Ciò che il server vede e JavaScript no",
+    tag: "lato server",
+    tagClass: "srv",
+    why: "Questi dati non sono leggibili dal browser perché il browser non li espone a se stesso. Ma il server li riceve " +
+         "a ogni singola richiesta, anche se JavaScript è disabilitato e anche se blocchi tutto lo scripting.",
+    rows: serverRows
+  });
+
+  const torRows = [
+    ["Tor Browser", "UA standardizzato, resistenza al fingerprinting attiva"],
+    ["VPN commerciale", "IP di datacenter, geolocalizzazione incoerente con la lingua"],
+    ["Proxy aziendale", "reverse DNS riconoscibile, IP fisso"],
+    ["Rete mobile", "IP condiviso tra migliaia di utenti, geolocalizzazione ampia"],
+    ["Rete domestica", "IP residenziale, ASN del provider locale"],
+    ["Connessione pubblica", "IP di hotel, aeroporto, bar, università"]
+  ];
+
+  card(grid, {
+    title: "Inferenze sulla tua rete",
+    tag: "lato server",
+    tagClass: "srv",
+    why: "Combinando IP, latenza, fuso orario dichiarato dal browser e lingua, un'IA può capire se stai usando una VPN " +
+         "e se la tua posizione dichiarata è coerente con quella reale.",
+    rows: torRows
+  });
+}
+
+/* ---------- 2.11 Inferenze ---------- */
+function collectInferences(grid){
+  const ua = navigator.userAgent;
+  const mobile = /Mobi|Android|iPhone/.test(ua);
+  const isMac = /Macintosh|Mac OS X/.test(ua) && navigator.maxTouchPoints > 1;
+  const cores = navigator.hardwareConcurrency || 0;
+  const mem = navigator.deviceMemory || 0;
+  const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){ return ""; } })();
+
+  const deviceClass = isMac ? "iPad (in modalità desktop)" :
+                      mobile ? (screen.width < 400 ? "Smartphone compatto" : "Smartphone") :
+                      cores <= 2 ? "Dispositivo molto economico o VM" :
+                      cores <= 4 ? "Laptop entry-level" :
+                      cores <= 8 ? "Laptop o desktop moderno" :
+                      "Workstation o dispositivo di fascia alta";
+
+  const hour = new Date().getHours();
+  const timeContext = hour < 5 ? "Notte fonda — probabile lavoro, insonnia o fuso orario diverso da quello abituale"
+                    : hour < 8 ? "Prima mattina — routine iniziale"
+                    : hour < 12 ? "Mattina lavorativa"
+                    : hour < 14 ? "Pausa pranzo"
+                    : hour < 18 ? "Pomeriggio lavorativo"
+                    : hour < 22 ? "Sera — tempo libero"
+                    : "Tarda sera — rilassamento o lavoro extra";
+
+  const countryHint = (() => {
+    if (/Europe\//.test(tz)) return "Europa";
+    if (/America\//.test(tz)) return "Americhe";
+    if (/Asia\//.test(tz)) return "Asia";
+    if (/Africa\//.test(tz)) return "Africa";
+    if (/Australia|Pacific\//.test(tz)) return "Oceania";
+    return "indeterminata";
+  })();
+
+  const langFull = (navigator.languages || [navigator.language]).join(", ");
+
+  card(grid, {
+    title: "Profilo del dispositivo",
+    tag: "inferenza",
+    tagClass: "srv",
+    why: "Nessuna di queste informazioni è dichiarata esplicitamente: sono tutte dedotte combinando i segnali raccolti sopra.",
+    rows: [
+      ["Classe di dispositivo", deviceClass],
+      ["Fascia di prezzo stimata", cores >= 8 && mem >= 8 ? "alta" : cores >= 4 ? "media" : "bassa"],
+      ["Anno approssimativo del dispositivo", cores >= 12 ? "recente (2021+)" : cores >= 8 ? "moderno (2018+)" : cores >= 4 ? "datato (2015+)" : "vecchio"],
+      ["Uso principale probabile", mobile ? "personale / mobile" : "lavoro o studio"],
+      ["Multi-monitor probabile", window.screenX > 0 || (screen.width > window.outerWidth + 100) ? "possibile" : "no"],
+      ["Zoom del browser attivo", Math.abs(window.outerWidth / window.innerWidth - 1) > 0.12 ? "probabile" : "no"]
+    ]
+  });
+
+  card(grid, {
+    title: "Profilo dell'utente",
+    tag: "inferenza",
+    tagClass: "srv",
+    why: "Un'IA non si limita a raccogliere dati: li interpreta. Da questi segnali costruisce un modello di chi sei, senza mai chiederti nulla.",
+    rows: [
+      ["Area geografica", countryHint],
+      ["Fuso orario", tz],
+      ["Lingue", langFull],
+      ["Contesto temporale", timeContext],
+      ["Lingua principale dedotta", navigator.language],
+      ["Probabile paese di residenza", navigator.language && navigator.language.includes("-") ? navigator.language.split("-").pop() : "non determinabile"],
+      ["Dispositivo condiviso o personale", !mobile && mem >= 8 ? "probabilmente personale" : "indeterminato"],
+      ["Profilo tecnico", /Firefox/.test(ua) ? "utente attento alla privacy" :
+                          /Edg/.test(ua) ? "utente Windows integrato nell'ecosistema Microsoft" :
+                          /Safari/.test(ua) && /Mac/.test(ua) ? "utente ecosistema Apple" :
+                          /Chrome/.test(ua) ? "utente mainstream" : "indeterminato"],
+      ["Sensibilità alla privacy", navigator.globalPrivacyControl ? "alta (GPC attivo)" :
+                                   navigator.doNotTrack === "1" ? "media (DNT attivo)" : "non dichiarata"],
+      ["Probabile competenza tecnica", navigator.webdriver ? "automazione/bot" :
+                                       cores >= 8 && !mobile ? "medio-alta" : "media"]
+    ]
+  });
+
+  card(grid, {
+    title: "Catena di deduzione",
+    tag: "inferenza",
+    tagClass: "srv",
+    why: "Ogni singolo segnale è quasi innocuo. La concatenazione è ciò che rende il profiling efficace.",
+    rows: [
+      ["1. Lingua + fuso orario", "→ paese e regione di residenza"],
+      ["2. User-Agent + Client Hints", "→ sistema operativo, browser, architettura"],
+      ["3. GPU + font + canvas", "→ dispositivo specifico, spesso unico"],
+      ["4. Risoluzione + DPR", "→ modello di schermo, tipo di dispositivo"],
+      ["5. Core CPU + RAM", "→ fascia di prezzo e generazione"],
+      ["6. Preferenze tema + movimento", "→ impostazioni di accessibilità, età del sistema"],
+      ["7. Stato permessi", "→ cosa hai già concesso ad altri siti"],
+      ["8. Comportamento", "→ attenzione, interesse, intento, competenza"],
+      ["9. Referrer + parametri URL", "→ da dove vieni e cosa cercavi"],
+      ["10. Contenuto della pagina", "→ cosa stai cercando di sapere"]
+    ]
+  });
+
+  card(grid, {
+    title: "Cosa NON può sapere (senza permesso)",
+    tag: "limiti",
+    tagClass: "state",
+    why: "È importante conoscere anche i confini. Il browser moderno è progettato per proteggere alcune informazioni — a patto che tu non le conceda.",
+    rows: [
+      ["Posizione GPS esatta", "richiede permesso esplicito"],
+      ["Contenuto della webcam", "richiede permesso esplicito"],
+      ["Contenuto del microfono", "richiede permesso esplicito"],
+      ["File sul disco", "inaccessibili senza selezione manuale"],
+      ["Cronologia di navigazione", "inaccessibile ad altri siti"],
+      ["Password salvate", "protette dal gestore password"],
+      ["Altri siti visitati", "protetti dalla same-origin policy"],
+      ["Contenuto degli appunti", "richiede gesto utente e permesso"],
+      ["Contatti e calendario", "richiedono API dedicate e permesso"],
+      ["Identità reale", "non deducibile dai soli dati tecnici"]
+    ]
+  });
+}
+
+/* ---------- 2.12 Difese ---------- */
+function collectDefenses(grid){
+  const html =
+    '<article class="card" style="grid-column:1/-1">' +
+    '<div class="card-head"><h3>Come ridurre concretamente la superficie esposta</h3>' +
+    '<span class="badge state">difese</span></div>' +
+    '<p class="why">Nessuna di queste contromisure è perfetta. Ognuna però riduce il numero di bit che ti descrivono, ' +
+    'e ridurre i bit significa confondersi nella folla.</p>' +
+
+    '<div class="callout danger">' +
+    '<h4>La difesa più efficace: normalizzare</h4>' +
+    '<p>Il fingerprinting funziona sull\'unicità. Se il tuo browser dichiara valori diversi da quelli di tutti gli altri, ' +
+    'sei identificabile anche senza cookie. Le contromisure migliori rendono il tuo profilo <strong>identico a quello di milioni di altre persone</strong>, ' +
+    'non semplicemente "falso".</p>' +
+    '</div>' +
+
+    '<div class="callout good">' +
+    '<h4>Contromisure pratiche, in ordine di impatto</h4>' +
+    '<ul>' +
+    '<li><strong>Tor Browser</strong> — progettato esplicitamente per rendere tutti gli utenti indistinguibili. Normalizza UA, ' +
+    'risoluzione, fuso orario, font e canvas. È la difesa più solida, al costo di una navigazione più lenta.</li>' +
+    '<li><strong>Firefox con resistenza al fingerprinting attiva</strong> (<code>privacy.resistFingerprinting</code>) — blocca canvas, ' +
+    'normalizza le dimensioni della finestra, falsifica il fuso orario.</li>' +
+    '<li><strong>Brave</strong> — randomizza le impronte canvas e audio a ogni sessione, invece di bloccarle.</li>' +
+    '<li><strong>Estensioni anti-fingerprint</strong> — utili ma a volte controproducenti: aggiungono a loro volta segnali unici.</li>' +
+    '<li><strong>Blocco degli script</strong> — elimina gran parte della raccolta attiva. Il contenuto testuale resta comunque leggibile.</li>' +
+    '<li><strong>Ridurre i font installati</strong> — l\'insieme dei font è uno dei segnali più forti e meno discussi.</li>' +
+    '<li><strong>Non personalizzare troppo il browser</strong> — estensioni, temi, dimensioni anomale della finestra, zoom: tutto ti distingue.</li>' +
+    '<li><strong>Separare i contesti</strong> — browser diversi per scopi diversi riducono la correlazione tra profili.</li>' +
+    '</ul>' +
+    '</div>' +
+
+    '<div class="callout warn" style="margin-top:14px">' +
+    '<h4>Perché la navigazione privata non basta</h4>' +
+    '<p>La modalità in incognito cancella cookie e cache locali, ma <strong>non cambia il tuo hardware, i tuoi font, ' +
+    'la tua GPU, il tuo fuso orario o la tua lingua</strong>. Un\'impronta calcolata in incognito è quasi identica a quella ' +
+    'calcolata in navigazione normale: la correlazione avviene comunque.</p>' +
+    '</div>' +
+
+    '<div class="callout info" style="margin-top:14px">' +
+    '<h4>Una nota onesta sull\'IA</h4>' +
+    '<p>Un\'intelligenza artificiale non "bara": raccoglie ciò che il browser le mette a disposizione, esattamente come ' +
+    'hai visto in questa pagina. La differenza rispetto a dieci anni fa non è nelle API — sono le stesse — ma nella ' +
+    '<strong>capacità di incrociare enormi quantità di segnali deboli</strong> e trasformarli in un profilo coerente. ' +
+    'Cinque dati banali, messi insieme, diventano un\'identità.</p>' +
+    '</div>' +
+
+    '</article>';
+
+  grid.innerHTML = html;
+}
+
+/* ================================================================
+   3. STATISTICHE FINALI
+   ================================================================ */
+let masterHashGlobal = "";
+let partsCountGlobal = 0;
+
+function updateStats(hash, parts){
+  masterHashGlobal = hash;
+  partsCountGlobal = parts;
+
+  const elS = document.getElementById("stat-signals");
+  const elE = document.getElementById("stat-entropy");
+  const elT = document.getElementById("stat-time");
+
+  /* Animazione del contatore */
+  let cur = 0;
+  const target = signalCount;
+  const step = Math.max(1, Math.ceil(target / 60));
+  const anim = setInterval(() => {
+    cur = Math.min(target, cur + step);
+    elS.textContent = cur;
+    if (cur >= target) clearInterval(anim);
+  }, 16);
+
+  /* Stima entropia: ~0.6 bit per segnale indipendente, con tetto realistico */
+  const entropy = Math.min(42, Math.round(target * 0.55));
+  elE.textContent = entropy;
+
+  elT.textContent = Math.round(performance.now() - t0) + " ms";
+}
+
+/* ================================================================
+   4. AVVIO
+   ================================================================ */
+async function init(){
+  const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){ return "?"; } })();
+  const uaGlobal = navigator.userAgent;
+
+  /* Rende uaGlobal accessibile alle funzioni di fingerprint */
+  window.uaGlobal = uaGlobal;
+
+  const gClient  = makeSection("client", "1 · Identità del client",
+    "Chi dice di essere il tuo browser. Questi valori vengono inviati a ogni singola richiesta HTTP, anche senza JavaScript.");
+  const gHW      = makeSection("hardware", "2 · Hardware e schermo",
+    "Le caratteristiche fisiche della macchina. Sono tra i segnali più stabili nel tempo: cambiare browser non le cambia.");
+  const gLocale  = makeSection("locale", "3 · Lingua, tempo e localizzazione",
+    "Il contesto culturale e geografico. Spesso rivela più della posizione IP, perché è una scelta consapevole dell'utente.");
+  const gPref    = makeSection("preferenze", "4 · Preferenze e accessibilità",
+    "Impostazioni del sistema operativo esposte come media query. Ogni preferenza restringe il gruppo di utenti a cui assomigli.");
+  const gState   = makeSection("stato", "5 · Stato del browser e permessi",
+    "Cosa hai concesso, cosa hai negato, cosa hai bloccato. Lo stato dei permessi è leggibile senza chiedere nulla.");
+  const gFP      = makeSection("fingerprint", "6 · Fingerprinting attivo",
+    "Qui la pagina smette di limitarsi a leggere e comincia a <em>calcolare</em>: canvas, GPU, audio, font. È il cuore del riconoscimento persistente.");
+  const gNet     = makeSection("rete", "7 · Rete e contesto della visita",
+    "Da dove vieni, come sei arrivato, quanto è veloce la tua linea, da quale pagina sei stato reindirizzato.");
+  const gContent = makeSection("contenuto", "8 · Contenuto e metadati della pagina",
+    "Ciò che un'IA legge anche senza eseguire JavaScript: testo, struttura, meta tag, commenti dimenticati nel sorgente.");
+  const gBehav   = makeSection("comportamento", "9 · Comportamento in tempo reale",
+    "Il segnale più difficile da nascondere: come ti muovi, quanto leggi, cosa tocchi, quanto resti.");
+  const gServer  = makeSection("server", "10 · Ciò che il server sa e il browser non vede",
+    "Dati invisibili a JavaScript ma ricevuti a ogni richiesta. Funzionano anche con JavaScript completamente disabilitato.");
+  const gInfer   = makeSection("inferenze", "11 · Cosa un'IA deduce",
+    "La sintesi: da dati grezzi a profilo. Nessuna di queste conclusioni è dichiarata da te.");
+  const gDef     = makeSection("difese", "12 · Difese e contromisure",
+    "Cosa funziona davvero, cosa è teatro, e perché la modalità in incognito non è la risposta.");
+
+  /* Esecuzione in sequenza */
+  collectClient(gClient);
+  collectHardware(gHW);
+  collectLocale(gLocale);
+  collectPreferences(gPref);
+  collectState(gState);
+  await collectFingerprint(gFP);
+  collectNetwork(gNet);
+  collectContent(gContent);
+  collectBehavior(gBehav);
+  collectServer(gServer);
+  collectInferences(gInfer);
+  collectDefenses(gDef);
+}
+
+init();
+</script>
+
+</body>
+</html>
