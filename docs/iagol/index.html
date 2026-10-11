@@ -3,92 +3,282 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Privacy e intelligenza artificiale - Indice del corso</title>
-<link rel="stylesheet" href="stile.css">
+<title>Privacy e sicurezza digitale — Lezione interattiva</title>
+<meta name="description" content="Quattro lezioni interattive su privacy, sicurezza delle password, targetizzazione pubblicitaria e anonimizzazione dei dati.">
+
+<style>
+:root{
+  --bg:#f6f8fb;
+  --card:#ffffff;
+  --border:#e2e8f0;
+  --border-hi:#cbd5e1;
+  --text:#0f1a2e;
+  --muted:#64748b;
+  --faint:#94a3b8;
+
+  --c1:#0891b2;  /* ciano — invisibledata */
+  --c2:#7c3aed;  /* viola — sicurezza */
+  --c3:#ea8a04;  /* ambra — targetizzazione */
+  --c4:#0d9488;  /* teal — anonimato */
+
+  --radius:16px;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.6;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:clamp(40px,7vw,80px) 24px 60px;
+}
+
+body::before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(700px 400px at 12% -6%,rgba(8,145,178,.07),transparent 60%),
+    radial-gradient(700px 400px at 88% 2%,rgba(124,58,237,.07),transparent 62%),
+    radial-gradient(600px 400px at 50% 106%,rgba(13,148,136,.05),transparent 60%);
+}
+
+main{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:900px;
+}
+
+/* --- Intestazione --- */
+header{
+  text-align:center;
+  margin-bottom:clamp(36px,5vw,54px);
+}
+
+.eyebrow{
+  display:inline-block;
+  font-size:.72rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-weight:700;
+  color:var(--muted);
+  background:#fff;
+  border:1px solid var(--border);
+  padding:6px 15px;
+  border-radius:999px;
+  margin-bottom:22px;
+}
+
+h1{
+  font-size:clamp(1.7rem,4.2vw,2.6rem);
+  line-height:1.15;
+  letter-spacing:-.025em;
+  font-weight:800;
+  margin:0 0 16px;
+}
+
+h1 em{
+  font-style:normal;
+  background:linear-gradient(120deg,var(--c1),var(--c2) 55%,var(--c4));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+p.lead{
+  color:var(--muted);
+  font-size:1.02rem;
+  max-width:56ch;
+  margin:0 auto;
+  line-height:1.7;
+}
+
+/* --- Griglia dei link --- */
+.cards{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+.card{
+  display:flex;
+  align-items:flex-start;
+  gap:18px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px 24px;
+  text-decoration:none;
+  color:inherit;
+  position:relative;
+  overflow:hidden;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+
+.card::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:4px;
+  background:var(--accent);
+  transition:width .18s ease;
+}
+
+.card:hover{
+  transform:translateY(-2px);
+  border-color:var(--border-hi);
+  box-shadow:0 6px 16px rgba(15,26,46,.07),0 14px 34px rgba(15,26,46,.06);
+}
+.card:hover::before{width:7px;}
+
+.card .icon{
+  flex:0 0 auto;
+  width:48px;height:48px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.5rem;
+  background:var(--accent-soft);
+  border:1px solid var(--accent-border);
+}
+
+.card .body{
+  flex:1;
+  min-width:0;
+}
+
+.card h2{
+  font-size:1.08rem;
+  font-weight:700;
+  letter-spacing:-.01em;
+  margin:0 0 5px;
+  line-height:1.35;
+}
+
+.card p{
+  margin:0;
+  font-size:.9rem;
+  color:var(--muted);
+  line-height:1.55;
+}
+
+.card .arrow{
+  flex:0 0 auto;
+  align-self:center;
+  color:var(--faint);
+  font-size:1.1rem;
+  transition:transform .18s ease,color .18s ease;
+}
+.card:hover .arrow{
+  color:var(--accent);
+  transform:translateX(4px);
+}
+
+.card.c1{--accent:var(--c1);--accent-soft:rgba(8,145,178,.09);--accent-border:rgba(8,145,178,.25);}
+.card.c2{--accent:var(--c2);--accent-soft:rgba(124,58,237,.09);--accent-border:rgba(124,58,237,.25);}
+.card.c3{--accent:var(--c3);--accent-soft:rgba(234,138,4,.09);--accent-border:rgba(234,138,4,.25);}
+.card.c4{--accent:var(--c4);--accent-soft:rgba(13,148,136,.09);--accent-border:rgba(13,148,136,.25);}
+
+/* --- Footer --- */
+footer{
+  margin-top:clamp(36px,5vw,52px);
+  text-align:center;
+  font-size:.82rem;
+  color:var(--faint);
+  line-height:1.7;
+}
+footer p{max-width:52ch;margin:0 auto;}
+
+/* --- Desktop: due colonne --- */
+@media (min-width:700px){
+  .cards{grid-template-columns:1fr 1fr;}
+}
+
+@media (max-width:520px){
+  .card{padding:18px 18px;gap:14px;}
+  .card .icon{width:42px;height:42px;font-size:1.3rem;}
+  .card h2{font-size:1rem;}
+  .card p{font-size:.85rem;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;}
+}
+</style>
 </head>
+
 <body>
-<header class="site-header">
-  <div class="wrap">
-    <a class="corso" href="index.html">Intelligenza artificiale: approccio agli strumenti di IA</a>
-    <span class="posizione">Incontro 3</span>
-  </div>
-</header>
 
-<main class="wrap">
-  <h1>Privacy e intelligenza artificiale</h1>
-  <p class="sottotitolo">Gestire l'identità digitale. Durata: 4 ore.</p>
+<main>
 
-  <p>Questi materiali accompagnano la lezione. Ogni modulo contiene esempi, esercizi da svolgere in aula e, dove serve, uno strumento che funziona direttamente nel browser.</p>
+  <header>
+    <span class="eyebrow">Lezione interattiva · Privacy digitale</span>
+    <h1>Quattro modi per capire<br><em>cosa lasciamo online</em></h1>
+    <p class="lead">
+      Un percorso in quattro tappe sulla privacy digitale, pensato per un pubblico non tecnico.
+      Ogni pagina è un file HTML autonomo: puoi aprirle nell'ordine che preferisci, anche offline.
+    </p>
+  </header>
 
-  <div class="nota">
-    <p><strong>Nessun dato lascia il tuo dispositivo.</strong> Foto, testi e password inseriti negli strumenti vengono elaborati solo sul tuo telefono o computer. Non serve alcun account.</p>
-  </div>
+  <nav class="cards" aria-label="Indice delle lezioni">
 
-  <h2>Cosa saprai fare alla fine</h2>
-  <ul>
-    <li>Spiegare quali dati raccolgono i sistemi di intelligenza artificiale e come li usano per creare un profilo dell'utente.</li>
-    <li>Controllare e rimuovere i metadati (per esempio la posizione) da una foto prima di condividerla.</li>
-    <li>Modificare le impostazioni di app, social, cloud e chatbot per limitare il tracciamento e la raccolta dei dati.</li>
-  </ul>
-  <p class="piccolo">Riferimento: DigComp 2.2, competenza 2.6 Gestire l'identità digitale (conoscenza 105, abilità 111 e 113).</p>
+    <a class="card c1" href="invisibledata.html">
+      <span class="icon" aria-hidden="true">👁️</span>
+      <span class="body">
+        <h2>Quello che una pagina vede di te</h2>
+        <p>Ogni volta che apri un sito, il tuo browser racconta molto più di quanto immagini: lingua, fuso orario, dispositivo, comportamento. Una panoramica dal vivo di ciò che è visibile.</p>
+      </span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
 
-  <h2>I cinque moduli</h2>
-  <div class="griglia">
-    <article class="card modulo">
-      <h3>Privacy e IA: dati raccolti e loro utilizzo</h3>
-      <p class="durata">Circa 1 ora e 15 minuti</p>
-      <p>Un profilo fittizio da analizzare: cosa si può capire di una persona dai suoi dati, anche senza che li abbia dichiarati.</p>
-      <a class="vai" href="01-dati-raccolti.html">Apri il modulo</a>
-    </article>
-    <article class="card modulo">
-      <h3>Protezione della privacy nei sistemi IA</h3>
-      <p class="durata">Circa 30 minuti</p>
-      <p>Che cosa si può scrivere in un chatbot e che cosa no. Dieci casi da classificare e le impostazioni da controllare.</p>
-      <a class="vai" href="02-privacy-nei-sistemi-ia.html">Apri il modulo</a>
-    </article>
-    <article class="card modulo">
-      <h3>Targetizzazione</h3>
-      <p class="durata">Circa 45 minuti</p>
-      <p>Un simulatore per vedere come pochi clic diventano un profilo e una pubblicità su misura.</p>
-      <a class="vai" href="03-targetizzazione.html">Apri il modulo</a>
-    </article>
-    <article class="card modulo">
-      <h3>Impostazioni di sicurezza su social e cloud</h3>
-      <p class="durata">Circa 45 minuti</p>
-      <p>Laboratorio guidato sul proprio telefono, con i collegamenti ai pannelli reali e un elenco di verifica.</p>
-      <a class="vai" href="04-impostazioni-social-cloud.html">Apri il modulo</a>
-    </article>
-    <article class="card modulo">
-      <h3>Anonimizzazione dei dati sensibili</h3>
-      <p class="durata">Circa 40 minuti</p>
-      <p>Tre strumenti: lettore e pulitore di metadati delle foto, anonimizzatore di testi, controllo della forza di una password.</p>
-      <a class="vai" href="05-anonimizzazione.html">Apri il modulo</a>
-    </article>
-  </div>
+    <a class="card c2" href="sicurezza.html">
+      <span class="icon" aria-hidden="true">🔐</span>
+      <span class="body">
+        <h2>Password e sicurezza degli account</h2>
+        <p>Perché le password vanno create in un certo modo, cosa succede davvero quando ne digiti una, e come configurare le impostazioni di sicurezza su social e cloud.</p>
+      </span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
 
-  <h2>Scaletta della lezione</h2>
-  <div class="scorri">
-    <table>
-      <thead><tr><th>Orario</th><th>Attività</th><th>Modulo</th></tr></thead>
-      <tbody>
-        <tr><td>0:00 - 0:30</td><td>Introduzione e "Detective dei dati"</td><td>1</td></tr>
-        <tr><td>0:30 - 1:15</td><td>Cosa raccolgono i sistemi IA, Attività Google dal vivo</td><td>1</td></tr>
-        <tr><td>1:15 - 2:00</td><td>Targetizzazione e simulatore</td><td>3</td></tr>
-        <tr><td>2:00 - 2:15</td><td>Pausa</td><td></td></tr>
-        <tr><td>2:15 - 2:45</td><td>Che cosa si può scrivere in un chatbot</td><td>2</td></tr>
-        <tr><td>2:45 - 3:15</td><td>Impostazioni su social e cloud, sul proprio telefono</td><td>4</td></tr>
-        <tr><td>3:15 - 3:45</td><td>Metadati delle foto e anonimizzazione dei testi</td><td>5</td></tr>
-        <tr><td>3:45 - 4:00</td><td>Ripasso e test finale</td><td></td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p class="piccolo">L'ordine dei moduli nella scaletta può essere adattato al gruppo. La durata indicata nelle card è orientativa.</p>
+    <a class="card c3" href="targetizzazione.html">
+      <span class="icon" aria-hidden="true">🎯</span>
+      <span class="body">
+        <h2>Perché vedi proprio quell'annuncio</h2>
+        <p>Come funziona la pubblicità mirata: profili, retargeting, pubblico simile. Con una simulazione che mostra perché due persone che cercano la stessa cosa vedono annunci diversi.</p>
+      </span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+
+    <a class="card c4" href="anonimato.html">
+      <span class="icon" aria-hidden="true">🕵️</span>
+      <span class="body">
+        <h2>Anonimizzare prima di condividere</h2>
+        <p>Togliere il nome non basta. Un laboratorio dal vivo mostra come pochi dati "innocui" permettano di risalire a una persona, e come difendersi con il k-anonimato.</p>
+      </span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+
+  </nav>
+
+  <footer>
+    <p>
+      Tutte le pagine funzionano interamente nel browser: nessun dato viene inviato,
+      nessun cookie, nessun tracciamento. Puoi salvarle e aprirle offline.
+    </p>
+  </footer>
+
 </main>
 
-<footer class="sito">
-  <div class="wrap">
-    Percorso di formazione GOL 1, riferimento progettuale DigComp 2.2. Le interfacce di Google, Meta e dei chatbot cambiano spesso: i percorsi dei menu vanno verificati prima della lezione.
-  </div>
-</footer>
 </body>
 </html>

@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Come funziona la targetizzazione pubblicitaria — Lezione interattiva</title>
+<meta name="description" content="Lezione interattiva per capire come gli annunci online vengono scelti in base a chi sei. Con simulazione di ricerca e quiz.">
+
+<style>
+/* ============================================================
+   VARIABILI — tema chiaro e caldo, adatto alla proiezione
+   ============================================================ */
+:root{
+  color-scheme: light;
+  --bg:#faf8f5;
+  --bg-soft:#f3efe8;
+  --card:#ffffff;
+  --border:#e8e2d8;
+  --border-hi:#d6cfc0;
+  --text:#1a1a1a;
+  --text-soft:#3d3d3d;
+  --muted:#6b6b6b;
+  --faint:#9a9a9a;
+  --ads:#ea8a04;
+  --ads-soft:#fff7e6;
+  --ads-border:#fcd34d;
+  --profile:#7c3aed;
+  --profile-soft:#f3e8ff;
+  --profile-border:#c4b5fd;
+  --fact:#0d9488;
+  --fact-soft:#e6fffb;
+  --fact-border:#5eead4;
+  --danger:#dc2626;
+  --danger-soft:#fef2f2;
+  --ok:#16a34a;
+  --ok-soft:#f0fdf4;
+  --radius:16px;
+  --radius-sm:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
+  --shadow-hi:0 4px 12px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.06);
+  --mono:ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --sans:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+
+html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100%;}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.65;
+  overflow-x:hidden;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  max-width:1100px;
+  margin:0 auto;
+  padding:clamp(48px,7vw,88px) 24px 40px;
+  text-align:center;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:.78rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ads);
+  background:var(--ads-soft);
+  border:1px solid var(--ads-border);
+  padding:7px 16px;
+  border-radius:999px;
+  margin-bottom:24px;
+  font-weight:600;
+}
+
+.hero h1{
+  font-size:clamp(2rem,5vw,3.3rem);
+  line-height:1.1;
+  letter-spacing:-.03em;
+  margin:0 0 22px;
+  font-weight:800;
+  color:var(--text);
+}
+.hero h1 em{
+  font-style:normal;
+  background:linear-gradient(120deg,var(--ads),var(--profile));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.hero p.lead{
+  font-size:clamp(1.05rem,1.8vw,1.22rem);
+  color:var(--text-soft);
+  max-width:68ch;
+  margin:0 auto 18px;
+  line-height:1.7;
+}
+
+.hero .notice{
+  display:inline-block;
+  margin-top:12px;
+  font-size:.82rem;
+  color:var(--muted);
+  background:var(--bg-soft);
+  border:1px solid var(--border);
+  padding:8px 16px;
+  border-radius:999px;
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.toc{
+  position:sticky;
+  top:0;
+  z-index:50;
+  backdrop-filter:blur(12px) saturate(180%);
+  -webkit-backdrop-filter:blur(12px) saturate(180%);
+  background:rgba(250,248,245,.85);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.toc::-webkit-scrollbar{display:none;}
+.toc-inner{
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 16px;
+  display:flex;
+  gap:2px;
+  white-space:nowrap;
+}
+.toc a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:.85rem;
+  font-weight:600;
+  padding:15px 14px;
+  border-bottom:2px solid transparent;
+  transition:color .18s, border-color .18s;
+}
+.toc a:hover{color:var(--text);border-bottom-color:var(--ads);}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+main{
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 24px 80px;
+}
+
+section.block{
+  padding:52px 0 12px;
+  scroll-margin-top:70px;
+}
+
+.block-head{
+  margin-bottom:28px;
+  max-width:75ch;
+}
+.block-head h2{
+  font-size:clamp(1.4rem,3vw,1.9rem);
+  letter-spacing:-.02em;
+  margin:0 0 10px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  line-height:1.25;
+}
+.block-head h2 .n{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;height:36px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--ads),var(--profile));
+  color:#fff;
+  font-size:1rem;
+  font-weight:800;
+}
+.block-head p{
+  margin:0;
+  color:var(--text-soft);
+  font-size:1.02rem;
+}
+
+/* ============================================================
+   CARD CONCETTI
+   ============================================================ */
+.concepts{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:16px;
+}
+
+.concept{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px 22px 20px;
+  box-shadow:var(--shadow);
+  transition:transform .2s, box-shadow .2s, border-color .2s;
+  position:relative;
+  overflow:hidden;
+}
+.concept:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-hi);
+  border-color:var(--border-hi);
+}
+.concept .ico{
+  font-size:1.9rem;
+  display:block;
+  margin-bottom:10px;
+  line-height:1;
+}
+.concept h3{
+  margin:0 0 8px;
+  font-size:1.05rem;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+.concept p{
+  margin:0;
+  font-size:.92rem;
+  color:var(--muted);
+  line-height:1.6;
+}
+.concept .tag{
+  display:inline-block;
+  margin-top:12px;
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:3px 10px;
+  border-radius:999px;
+}
+.tag.ads{background:var(--ads-soft);color:#a15c00;border:1px solid var(--ads-border);}
+.tag.profile{background:var(--profile-soft);color:#5b21b6;border:1px solid var(--profile-border);}
+.tag.fact{background:var(--fact-soft);color:#0f766e;border:1px solid var(--fact-border);}
+
+/* ============================================================
+   LABORATORIO — SIMULAZIONE RICERCA
+   ============================================================ */
+.lab{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:24px;
+  box-shadow:var(--shadow);
+}
+
+.lab-controls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  margin-bottom:26px;
+}
+@media (max-width:760px){
+  .lab-controls{grid-template-columns:1fr;}
+}
+
+.control-label{
+  font-size:.76rem;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--faint);
+  margin-bottom:10px;
+  display:block;
+}
+
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.chip{
+  border:1.5px solid var(--border-hi);
+  background:var(--card);
+  color:var(--text-soft);
+  font-family:var(--sans);
+  font-size:.88rem;
+  font-weight:600;
+  padding:9px 15px;
+  border-radius:999px;
+  cursor:pointer;
+  transition:all .18s;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  line-height:1.2;
+}
+.chip:hover{
+  border-color:var(--ads);
+  color:var(--ads);
+  transform:translateY(-1px);
+}
+.chip.active{
+  background:linear-gradient(135deg,var(--ads),#f59e0b);
+  border-color:var(--ads);
+  color:#fff;
+  box-shadow:0 3px 12px rgba(234,138,4,.3);
+}
+.chip.active.profile{
+  background:linear-gradient(135deg,var(--profile),#a78bfa);
+  border-color:var(--profile);
+  box-shadow:0 3px 12px rgba(124,58,237,.3);
+}
+
+/* --- Barra di ricerca finta --- */
+.searchbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:var(--bg-soft);
+  border:1.5px solid var(--border);
+  border-radius:999px;
+  padding:12px 20px;
+  margin-bottom:8px;
+  font-size:1rem;
+}
+.searchbar .ico{font-size:1.15rem;opacity:.6;}
+.searchbar .query{
+  font-family:var(--sans);
+  color:var(--text);
+  font-weight:500;
+  flex:1;
+}
+.searchbar .cursor{
+  display:inline-block;
+  width:2px;height:1.1em;
+  background:var(--ads);
+  margin-left:2px;
+  vertical-align:-2px;
+  animation:blink 1s steps(2) infinite;
+}
+@keyframes blink{50%{opacity:0;}}
+
+.search-note{
+  font-size:.8rem;
+  color:var(--faint);
+  margin:0 0 26px 6px;
+  font-style:italic;
+}
+
+/* --- Blocco annunci --- */
+.ads-header{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.ads-header h4{
+  margin:0;
+  font-size:.95rem;
+  font-weight:700;
+  color:var(--text);
+}
+.ads-header .profile-tag{
+  font-size:.82rem;
+  color:var(--profile);
+  font-weight:600;
+  background:var(--profile-soft);
+  border:1px solid var(--profile-border);
+  padding:4px 12px;
+  border-radius:999px;
+}
+
+.ads-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:14px;
+  margin-bottom:24px;
+}
+
+.ad{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:16px;
+  position:relative;
+  transition:transform .2s, box-shadow .2s;
+  animation:adIn .4s cubic-bezier(.2,.7,.3,1) both;
+}
+.ad:nth-child(1){animation-delay:.02s;}
+.ad:nth-child(2){animation-delay:.08s;}
+.ad:nth-child(3){animation-delay:.14s;}
+@keyframes adIn{
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.ad:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-hi);
+}
+
+.ad .corner{
+  position:absolute;
+  top:10px;right:12px;
+  font-size:1rem;
+  color:var(--faint);
+  cursor:default;
+  line-height:1;
+}
+.ad .sponsored{
+  font-size:.65rem;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ads);
+  display:block;
+  margin-bottom:8px;
+}
+.ad .brand{
+  font-weight:700;
+  font-size:.95rem;
+  color:var(--text);
+  display:block;
+  margin-bottom:4px;
+  line-height:1.3;
+}
+.ad .headline{
+  font-size:.85rem;
+  color:var(--text-soft);
+  display:block;
+  margin-bottom:10px;
+  line-height:1.5;
+  min-height:2.6em;
+}
+.ad .cta{
+  display:inline-block;
+  background:var(--ads-soft);
+  color:#a15c00;
+  font-size:.75rem;
+  font-weight:700;
+  padding:5px 12px;
+  border-radius:6px;
+  border:1px solid var(--ads-border);
+}
+
+/* --- Spiegazione perché --- */
+.why-box{
+  background:var(--fact-soft);
+  border:1px solid var(--fact-border);
+  border-radius:var(--radius-sm);
+  padding:18px 20px;
+}
+.why-box h4{
+  margin:0 0 12px;
+  font-size:.9rem;
+  font-weight:800;
+  color:#0f766e;
+  letter-spacing:.02em;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.why-box ul{
+  margin:0;
+  padding:0;
+  list-style:none;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:8px 22px;
+}
+.why-box li{
+  font-size:.88rem;
+  color:#115e59;
+  padding-left:20px;
+  position:relative;
+  line-height:1.5;
+}
+.why-box li::before{
+  content:"→";
+  position:absolute;
+  left:0;
+  color:var(--fact);
+  font-weight:700;
+}
+
+/* ============================================================
+   PROFILO LIVE
+   ============================================================ */
+.profile-panel{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+@media (max-width:760px){
+  .profile-panel{grid-template-columns:1fr;}
+}
+
+.signal-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+.signal-card h4{
+  margin:0 0 14px;
+  font-size:.95rem;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.signal-card h4 .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--fact);
+  flex:0 0 auto;
+  box-shadow:0 0 0 0 rgba(13,148,136,.5);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(13,148,136,.5);}
+  70%{box-shadow:0 0 0 10px rgba(13,148,136,0);}
+  100%{box-shadow:0 0 0 0 rgba(13,148,136,0);}
+}
+
+.sig-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:14px;
+  padding:7px 0;
+  border-bottom:1px dashed var(--border);
+  font-size:.87rem;
+}
+.sig-row:last-child{border-bottom:none;}
+.sig-row .k{color:var(--muted);flex:0 0 auto;}
+.sig-row .v{
+  font-weight:600;
+  color:var(--text);
+  text-align:right;
+  font-family:var(--mono);
+  font-size:.82rem;
+  word-break:break-word;
+}
+
+.deduction{
+  background:var(--profile-soft);
+  border:1px solid var(--profile-border);
+  border-radius:var(--radius);
+  padding:22px;
+  box-shadow:var(--shadow);
+  grid-column:1/-1;
+}
+.deduction h4{
+  margin:0 0 14px;
+  font-size:.95rem;
+  font-weight:800;
+  color:#5b21b6;
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.deduction ul{
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+.deduction li{
+  padding:9px 0 9px 28px;
+  position:relative;
+  font-size:.92rem;
+  color:#4c1d95;
+  border-bottom:1px dashed var(--profile-border);
+  line-height:1.5;
+}
+.deduction li:last-child{border-bottom:none;}
+.deduction li::before{
+  content:"👤";
+  position:absolute;
+  left:0;
+  top:9px;
+  font-size:.85rem;
+}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz-wrap{
+  max-width:820px;
+  margin:0 auto;
+}
+
+.quiz-progress{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:26px;
+  font-size:.85rem;
+  color:var(--muted);
+  font-weight:600;
+}
+.progress-bar{
+  flex:1;
+  height:8px;
+  background:var(--bg-soft);
+  border-radius:999px;
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--ads),var(--profile));
+  width:0%;
+  transition:width .4s cubic-bezier(.2,.7,.3,1);
+  border-radius:999px;
+}
+
+.question{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:28px;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+  display:none;
+}
+.question.active{display:block;animation:qIn .3s ease both;}
+@keyframes qIn{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.q-num{
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ads);
+  margin-bottom:10px;
+  display:block;
+}
+.q-text{
+  font-size:1.12rem;
+  font-weight:700;
+  line-height:1.45;
+  margin:0 0 22px;
+  letter-spacing:-.01em;
+  color:var(--text);
+}
+
+.options{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.option{
+  background:#fff;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:15px 18px;
+  cursor:pointer;
+  font-family:var(--sans);
+  font-size:.95rem;
+  color:var(--text-soft);
+  text-align:left;
+  line-height:1.5;
+  transition:all .15s;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  width:100%;
+}
+.option:hover:not(.locked){
+  border-color:var(--ads);
+  background:var(--ads-soft);
+  transform:translateX(3px);
+}
+.option .letter{
+  flex:0 0 auto;
+  width:24px;height:24px;
+  border-radius:6px;
+  background:var(--bg-soft);
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.78rem;
+  font-weight:800;
+  color:var(--muted);
+  margin-top:1px;
+}
+.option.correct{
+  border-color:var(--ok);
+  background:var(--ok-soft);
+  color:#14532d;
+}
+.option.correct .letter{
+  background:var(--ok);
+  border-color:var(--ok);
+  color:#fff;
+}
+.option.wrong{
+  border-color:var(--danger);
+  background:var(--danger-soft);
+  color:#7f1d1d;
+}
+.option.wrong .letter{
+  background:var(--danger);
+  border-color:var(--danger);
+  color:#fff;
+}
+.option.locked{cursor:default;}
+
+.feedback{
+  margin-top:18px;
+  padding:16px 18px;
+  border-radius:var(--radius-sm);
+  font-size:.92rem;
+  line-height:1.6;
+  display:none;
+}
+.feedback.show{display:block;animation:fIn .3s ease both;}
+@keyframes fIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+.feedback.good{background:var(--ok-soft);border:1px solid #86efac;color:#14532d;}
+.feedback.bad{background:var(--danger-soft);border:1px solid #fca5a5;color:#7f1d1d;}
+.feedback strong{font-weight:800;}
+
+.quiz-nav{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:6px;
+}
+
+.btn{
+  font-family:var(--sans);
+  font-size:.95rem;
+  font-weight:700;
+  padding:12px 26px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  transition:all .18s;
+  background:linear-gradient(135deg,var(--ads),#f59e0b);
+  color:#fff;
+  box-shadow:0 3px 14px rgba(234,138,4,.3);
+}
+.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(234,138,4,.4);
+}
+.btn:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+.btn.ghost{
+  background:transparent;
+  color:var(--muted);
+  border:1.5px solid var(--border-hi);
+  box-shadow:none;
+}
+.btn.ghost:hover{
+  color:var(--text);
+  border-color:var(--text);
+  box-shadow:none;
+}
+
+/* --- Risultato quiz --- */
+.result{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:36px 28px;
+  text-align:center;
+  box-shadow:var(--shadow);
+  display:none;
+}
+.result.show{display:block;animation:qIn .4s ease both;}
+.result .big{
+  font-size:3.2rem;
+  font-weight:800;
+  line-height:1;
+  background:linear-gradient(135deg,var(--ads),var(--profile));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  margin:0 0 6px;
+}
+.result .score-label{
+  font-size:.85rem;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--faint);
+  font-weight:700;
+  margin-bottom:20px;
+}
+.result h3{
+  font-size:1.3rem;
+  margin:0 0 12px;
+  font-weight:800;
+  letter-spacing:-.01em;
+}
+.result p{
+  color:var(--muted);
+  max-width:56ch;
+  margin:0 auto 24px;
+  font-size:.95rem;
+  line-height:1.65;
+}
+
+/* ============================================================
+   CHIUSURA
+   ============================================================ */
+.closing{
+  background:linear-gradient(135deg,var(--profile-soft),var(--ads-soft));
+  border:1px solid var(--profile-border);
+  border-radius:var(--radius);
+  padding:36px 32px;
+  margin-top:20px;
+}
+.closing h3{
+  margin:0 0 14px;
+  font-size:1.25rem;
+  font-weight:800;
+  letter-spacing:-.01em;
+  color:#4c1d95;
+}
+.closing p{
+  color:#3d3d3d;
+  margin:0 0 14px;
+  font-size:.98rem;
+  line-height:1.7;
+}
+.closing p:last-child{margin-bottom:0;}
+.closing ul{
+  margin:14px 0 0;
+  padding-left:20px;
+  color:#3d3d3d;
+  font-size:.95rem;
+}
+.closing li{margin-bottom:9px;line-height:1.6;}
+.closing li:last-child{margin-bottom:0;}
+.closing strong{color:#1a1a1a;font-weight:700;}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  border-top:1px solid var(--border);
+  margin-top:70px;
+  padding:40px 24px 60px;
+  text-align:center;
+  color:var(--faint);
+  font-size:.85rem;
+  background:var(--bg-soft);
+}
+footer p{max-width:64ch;margin:0 auto 10px;line-height:1.7;}
+footer strong{color:var(--muted);}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:640px){
+  body{font-size:16px;}
+  main{padding-left:16px;padding-right:16px;}
+  .hero{padding-left:16px;padding-right:16px;}
+  .lab{padding:18px;}
+  .ads-grid{grid-template-columns:1fr;}
+  .why-box ul{grid-template-columns:1fr;}
+  .question{padding:22px;}
+  .closing{padding:26px 22px;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important;}
+  html{scroll-behavior:auto;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero">
+  <span class="eyebrow">Lezione interattiva · targetizzazione</span>
+  <h1>Perché vedi <em>proprio quell'annuncio</em>?</h1>
+  <p class="lead">
+    Due persone cercano la stessa cosa nello stesso momento. Una riceve annunci di sneakers da 30&nbsp;€,
+    l'altra di mocassini artigianali da 250&nbsp;€. Nessuno ha scritto niente da nessuna parte:
+    il sistema ha <strong>dedotto</strong> chi sono. Questa pagina mostra come, con una simulazione,
+    una lettura dal vivo del tuo browser e un piccolo quiz.
+  </p>
+  <span class="notice">🎭 Gli annunci mostrati nella simulazione sono inventati a scopo didattico</span>
+</header>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#concetti">Come funziona</a>
+    <a href="#lab">Laboratorio</a>
+    <a href="#profilo">Il tuo profilo</a>
+    <a href="#quiz">Quiz</a>
+    <a href="#chiusura">Conclusione</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ==========================================================
+       1. CONCETTI
+       ========================================================== -->
+  <section class="block" id="concetti">
+    <div class="block-head">
+      <h2><span class="n">1</span> Come funziona, in sei idee</h2>
+      <p>Sei meccanismi che, messi insieme, permettono di scegliere l'annuncio giusto per la persona giusta
+        senza che nessuno glielo chieda.</p>
+    </div>
+
+    <div class="concepts">
+      <article class="concept">
+        <span class="ico">🍪</span>
+        <h3>Il cookie</h3>
+        <p>Un piccolo file che un sito salva nel tuo browser. Serve a ricordarti: "questo è lo stesso
+          visitatore di ieri". Da solo è innocuo, ma è il filo che collega le tue visite.</p>
+        <span class="tag fact">tecnica di base</span>
+      </article>
+
+      <article class="concept">
+        <span class="ico">📡</span>
+        <h3>Il pixel di tracciamento</h3>
+        <p>Un'immagine invisibile grande un pixel, inserita in una pagina o in una email. Quando la carichi,
+          avvisi un server esterno: "questo utente ha visto questa pagina, a quest'ora, da questo dispositivo".</p>
+        <span class="tag fact">tecnica di base</span>
+      </article>
+
+      <article class="concept">
+        <span class="ico">🎯</span>
+        <h3>Il retargeting</h3>
+        <p>Hai guardato un paio di scarpe senza comprarle. Per giorni, ovunque navighi, continui a vedere
+          quell'esatto paio di scarpe. Non è una coincidenza: è un annuncio che ti sta inseguendo.</p>
+        <span class="tag ads">profilazione attiva</span>
+      </article>
+
+      <article class="concept">
+        <span class="ico">👥</span>
+        <h3>Il pubblico simile (lookalike)</h3>
+        <p>Una marca ha 10.000 clienti fedeli. Chiede alla piattaforma: "trovami altri 100.000 italiani
+          che assomigliano a questi". Il sistema li cerca confrontando migliaia di segnali anonimi.</p>
+        <span class="tag profile">profilazione predittiva</span>
+      </article>
+
+      <article class="concept">
+        <span class="ico">🧠</span>
+        <h3>La profilazione comportamentale</h3>
+        <p>Non conta solo <em>cosa</em> cerchi, ma <em>come</em>: a che ora, da quale dispositivo, quanto
+          tempo resti, cosa clicchi, cosa ignori. Il comportamento rivela più di qualsiasi modulo compilato.</p>
+        <span class="tag profile">profilazione predittiva</span>
+      </article>
+
+      <article class="concept">
+        <span class="ico">🔗</span>
+        <h3>La concatenazione</h3>
+        <p>Ogni singolo dato è quasi anonimo. Lingua + fuso orario + dispositivo + orario + comportamento,
+          messi insieme, formano un profilo che ti distingue da milioni di altre persone.</p>
+        <span class="tag ads">il vero motore</span>
+      </article>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       2. LABORATORIO
+       ========================================================== -->
+  <section class="block" id="lab">
+    <div class="block-head">
+      <h2><span class="n">2</span> Laboratorio: la stessa ricerca, annunci diversi</h2>
+      <p>Scegli una ricerca e un profilo. Osserva come cambiano gli annunci che il sistema deciderebbe di
+        mostrarti. Il testo della ricerca è identico: cambia solo <em>chi pensa che tu sia</em>.</p>
+    </div>
+
+    <div class="lab">
+
+      <div class="lab-controls">
+        <div>
+          <span class="control-label">🔍 Cosa cerchi</span>
+          <div class="chips" id="search-chips"></div>
+        </div>
+        <div>
+          <span class="control-label">👤 Chi pensa il sistema che tu sia</span>
+          <div class="chips" id="profile-chips"></div>
+        </div>
+      </div>
+
+      <div class="searchbar">
+        <span class="ico">🔍</span>
+        <span class="query" id="search-display">scarpe da ginnastica<span class="cursor"></span></span>
+      </div>
+      <p class="search-note">Risultati sponsorizzati — la parte alta della pagina</p>
+
+      <div class="ads-header">
+        <h4>Annunci mostrati</h4>
+        <span class="profile-tag" id="profile-tag">Profilo: Studente · 20 anni</span>
+      </div>
+
+      <div class="ads-grid" id="ads-grid"></div>
+
+      <div class="why-box">
+        <h4>💡 Perché proprio questi annunci?</h4>
+        <ul id="why-list"></ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       3. PROFILO LIVE
+       ========================================================== -->
+  <section class="block" id="profilo">
+    <div class="block-head">
+      <h2><span class="n">3</span> Cosa il tuo browser ha appena rivelato</h2>
+      <p>Questi valori sono stati letti <strong>dal vivo</strong> nel tuo browser pochi istanti fa, senza
+        chiederti nulla. Un pubblicitario li userebbe per decidere quale annuncio mostrarti e a che prezzo.</p>
+    </div>
+
+    <div class="profile-panel">
+
+      <div class="signal-card">
+        <h4><span class="dot"></span> Segnali tecnici rilevati</h4>
+        <div id="signals-tech"></div>
+      </div>
+
+      <div class="signal-card">
+        <h4><span class="dot"></span> Contesto della visita</h4>
+        <div id="signals-context"></div>
+      </div>
+
+      <div class="deduction">
+        <h4>🧩 Cosa ne deduce un sistema pubblicitario</h4>
+        <ul id="deductions"></ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       4. QUIZ
+       ========================================================== -->
+  <section class="block" id="quiz">
+    <div class="block-head">
+      <h2><span class="n">4</span> Quiz: hai capito il meccanismo?</h2>
+      <p>Sei domande, risposta immediata e spiegazione. Serve a fissare i concetti, non a metterti in difficoltà.</p>
+    </div>
+
+    <div class="quiz-wrap">
+      <div class="quiz-progress">
+        <span id="progress-label">Domanda 1 di 6</span>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+
+      <div id="quiz-questions"></div>
+
+      <div class="quiz-nav" id="quiz-nav">
+        <button class="btn" id="next-btn" disabled>Avanti →</button>
+      </div>
+
+      <div class="result" id="quiz-result">
+        <p class="big" id="result-score">0/6</p>
+        <p class="score-label">risposte corrette</p>
+        <h3 id="result-title">—</h3>
+        <p id="result-text">—</p>
+        <button class="btn ghost" id="restart-btn">↻ Rifai il quiz</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       5. CHIUSURA
+       ========================================================== -->
+  <section class="block" id="chiusura">
+    <div class="block-head">
+      <h2><span class="n">5</span> Cosa portarsi a casa</h2>
+    </div>
+
+    <div class="closing">
+      <h3>La targetizzazione non è magia: è un'industria di piccoli indizi</h3>
+      <p>
+        Nessun singolo dato che hai visto in questa pagina è, da solo, particolarmente rivelatore.
+        La tua lingua è quella di milioni di persone. La tua risoluzione schermo è comune.
+        Il tuo fuso orario è condiviso da una nazione intera.
+      </p>
+      <p>
+        Il problema non è il singolo indizio: è la <strong>capacità di incrociarli</strong>. Quando un sistema
+        sa che sei in Italia, parli italiano, navighi da mobile, di notte, hai cercato scarpe, hai visitato
+        tre siti di sneakers e sei rimasto 40 secondi su un paio da 29&nbsp;€, ha già un ritratto di te più
+        preciso di quello che scriveresti in una presentazione.
+      </p>
+      <ul>
+        <li><strong>Non esiste un interruttore "disattiva profilazione"</strong> che funzioni davvero su tutto. Esistono tutele parziali e browser più attenti di altri.</li>
+        <li><strong>La modalità in incognito non ti rende anonimo</strong>: cancella i cookie, non il tuo dispositivo, i tuoi font, la tua lingua o il tuo comportamento.</li>
+        <li><strong>Il consenso è spesso un finto consenso</strong>: banner progettati per farti cliccare "Accetta" senza pensarci.</li>
+        <li><strong>La consapevolezza è già una difesa</strong>: chi sa come funziona, clicca diversamente, cerca diversamente, sceglie diversamente.</li>
+        <li><strong>Gli strumenti concreti esistono</strong>: browser attenti alla privacy, estensioni, blocchi degli script, separazione dei contesti. Non sono perfetti, ma riducono i bit che ti descrivono.</li>
+      </ul>
+      <p style="margin-top:18px">
+        La domanda da portarsi via non è "come faccio a sparire?", ma
+        <strong>"quanto sono disposto a essere letto, e da chi?"</strong>.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>
+    <strong>Lezione didattica.</strong> Gli annunci mostrati nella simulazione sono inventati.
+    I segnali tecnici sono letti dal vivo nel tuo browser e non vengono inviati da nessuna parte.
+  </p>
+  <p>
+    Questa pagina è un singolo file HTML statico: nessun server, nessun tracciamento, nessun cookie.
+    Puoi salvarla e aprirla offline.
+  </p>
+</footer>
+
+<script>
+"use strict";
+
+/* ================================================================
+   0. UTILITÀ
+   ================================================================ */
+const $ = id => document.getElementById(id);
+
+/* ================================================================
+   1. DATI DELLA SIMULAZIONE
+   ================================================================ */
+
+const SEARCHES = {
+  scarpe:   { label: "scarpe da ginnastica", emoji: "👟" },
+  vacanza:  { label: "vacanza al mare",      emoji: "🏖️" },
+  crema:    { label: "crema viso",           emoji: "🧴" }
+};
+
+const PROFILES = {
+  studente: {
+    emoji: "🎓",
+    label: "Studente · 20 anni",
+    short: "Studente",
+    why: [
+      "Budget contenuto: prezzi bassi, sconti, rate",
+      "Sempre su mobile: formati brevi e verticali",
+      "Naviga di notte: annunci fuori orario standard",
+      "Fast fashion, delivery economico, musica"
+    ]
+  },
+  genitore: {
+    emoji: "👶",
+    label: "Neo-genitore · 34 anni",
+    short: "Genitore",
+    why: [
+      "Tempo limitato: soluzioni pratiche e veloci",
+      "Sicurezza e recensioni di altri genitori",
+      "Prodotti per bambini, famiglia, casa",
+      "Consegna a domicilio e resi facili"
+    ]
+  },
+  manager: {
+    emoji: "💼",
+    label: "Manager · 45 anni",
+    short: "Manager",
+    why: [
+      "Qualità e status: marchi premium, made in Italy",
+      "Efficienza: consegna express, servizi su misura",
+      "Viaggi di lavoro, benessere, tempo libero di valore",
+      "Prodotti considerati investimenti, non spese"
+    ]
+  },
+  pensionato: {
+    emoji: "🌿",
+    label: "Pensionato · 68 anni",
+    short: "Pensionato",
+    why: [
+      "Comfort e salute prima di tutto",
+      "Consigli medici e rimborsabilità",
+      "Prezzi trasparenti, assistenza telefonica",
+      "Tempo libero: terme, giardinaggio, viaggi lenti"
+    ]
+  }
+};
+
+/* --- Annunci: [profilo][ricerca] = array di 3 --- */
+const ADS = {
+  studente: {
+    scarpe: [
+      { brand:"SneakerFast",    headline:"Sneakers a 29,99€ — spedizione gratis",        cta:"Scopri" },
+      { brand:"TrendKicks",     headline:"Le scarpe che spopolano su TikTok",           cta:"Vedi ora" },
+      { brand:"OutletCampus",   headline:"-60% su tutte le sneakers con carta studente", cta:"Approfitta" }
+    ],
+    vacanza: [
+      { brand:"Interrail",      headline:"Europa in treno da 199€ — pass under 26",      cta:"Prenota" },
+      { brand:"HostelWorld",    headline:"Dormitori da 12€ a notte, cancellazione gratis", cta:"Cerca" },
+      { brand:"VoloLow",        headline:"Voli da 9,99€ — solo bagaglio a mano",         cta:"Confronta" }
+    ],
+    crema: [
+      { brand:"FarmaciaOnline", headline:"Crema idratante 4,99€ — la più scelta",        cta:"Ordina" },
+      { brand:"BottegaVerde",   headline:"Promo 3x2 su tutta la skincare",              cta:"Vedi offerte" },
+      { brand:"EssenzaLow",     headline:"Skincare base a partire da 3€",               cta:"Scopri" }
+    ]
+  },
+  genitore: {
+    scarpe: [
+      { brand:"BimboSport",     headline:"Scarpe primo passo 39€ — più vendute",        cta:"Acquista" },
+      { brand:"MammaFit",       headline:"Sneakers comode per chi corre dietro ai bimbi", cta:"Prova" },
+      { brand:"FamigliaStore",  headline:"2 paia a 59€ — resi gratuiti 100 giorni",      cta:"Ordina" }
+    ],
+    vacanza: [
+      { brand:"FamilyResort",   headline:"Villaggi con miniclub da 89€/notte tutto incluso", cta:"Prenota" },
+      { brand:"BabyHotel",      headline:"Hotel attrezzati per neonati — culle gratis",  cta:"Cerca" },
+      { brand:"PrenotaFacile",  headline:"Pacchetti famiglia con volo e cancellazione flessibile", cta:"Vedi" }
+    ],
+    crema: [
+      { brand:"BabyCare",       headline:"Crema cambio pannolino 8,99€ — testata pediatricamente", cta:"Ordina" },
+      { brand:"MammaBella",     headline:"Crema anti-smagliature 19€ — scelta da 8 mamme su 10", cta:"Scopri" },
+      { brand:"FarmaciaFamiglia", headline:"Kit neonato completo -30% — consegna in giornata", cta:"Approfitta" }
+    ]
+  },
+  manager: {
+    scarpe: [
+      { brand:"EleganceMilano", headline:"Mocassini in pelle 249€ — fatti a mano in Italia", cta:"Scopri" },
+      { brand:"RunPro",         headline:"Scarpe da running 180€ — per chi corre all'alba", cta:"Prova" },
+      { brand:"BossShoes",      headline:"Nuova collezione A/I — spedizione express gratis", cta:"Vedi" }
+    ],
+    vacanza: [
+      { brand:"LuxuryRetreat",  headline:"Suite con vista 5 stelle — Maldive, Dubai, Seychelles", cta:"Prenota" },
+      { brand:"BusinessFly",    headline:"Voli business a tariffe aziendali — fast track e lounge", cta:"Richiedi" },
+      { brand:"GolfResort",     headline:"Settimana golf in Toscana — spa e ristorante stellato", cta:"Scopri" }
+    ],
+    crema: [
+      { brand:"AntiAge Pro",    headline:"Siero antirughe 89€ — risultati in 4 settimane", cta:"Acquista" },
+      { brand:"DermaClinic",    headline:"Trattamento viso in studio — prima consulenza gratis", cta:"Prenota" },
+      { brand:"TravelKit",      headline:"Kit skincare da viaggio in formato cabina",     cta:"Scopri" }
+    ]
+  },
+  pensionato: {
+    scarpe: [
+      { brand:"ComfortPlus",    headline:"Scarpe ortopediche 59€ — massimo comfort",     cta:"Ordina" },
+      { brand:"PiedeSano",      headline:"Calzature per diabetici — rimborsabili con ricetta", cta:"Informati" },
+      { brand:"GiardinoFacile", headline:"Zoccoli da lavoro 19€ — per orto e giardino",  cta:"Vedi" }
+    ],
+    vacanza: [
+      { brand:"TermeItalia",    headline:"Soggiorni termali 7 notti — convenzione over 65", cta:"Prenota" },
+      { brand:"BusTour",        headline:"Gite in pullman di 1 giorno — partenze da tutta Italia", cta:"Cerca" },
+      { brand:"CrocieraSenior", headline:"Crociere nel Mediterraneo — sconto 20% over 65", cta:"Vedi" }
+    ],
+    crema: [
+      { brand:"ArnicaForte",    headline:"Crema per dolori articolari — consigliata dal medico", cta:"Ordina" },
+      { brand:"PelleMatura",    headline:"Crema nutriente 65+ con acido ialuronico",     cta:"Scopri" },
+      { brand:"FarmaciaSociale", headline:"Ordina al telefono, consegniamo a casa",      cta:"Chiama" }
+    ]
+  }
+};
+
+/* ================================================================
+   2. LABORATORIO INTERATTIVO
+   ================================================================ */
+let currentSearch = "scarpe";
+let currentProfile = "studente";
+
+function buildChips(){
+  const sc = $("search-chips");
+  const pc = $("profile-chips");
+
+  Object.entries(SEARCHES).forEach(([key, s]) => {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.dataset.key = key;
+    b.innerHTML = s.emoji + " " + s.label;
+    b.addEventListener("click", () => {
+      currentSearch = key;
+      updateChips();
+      renderLab();
+    });
+    sc.appendChild(b);
+  });
+
+  Object.entries(PROFILES).forEach(([key, p]) => {
+    const b = document.createElement("button");
+    b.className = "chip profile";
+    b.dataset.key = key;
+    b.innerHTML = p.emoji + " " + p.label;
+    b.addEventListener("click", () => {
+      currentProfile = key;
+      updateChips();
+      renderLab();
+    });
+    pc.appendChild(b);
+  });
+}
+
+function updateChips(){
+  document.querySelectorAll("#search-chips .chip").forEach(c => {
+    c.classList.toggle("active", c.dataset.key === currentSearch);
+  });
+  document.querySelectorAll("#profile-chips .chip").forEach(c => {
+    c.classList.toggle("active", c.dataset.key === currentProfile);
+  });
+}
+
+function renderLab(){
+  const search = SEARCHES[currentSearch];
+  const profile = PROFILES[currentProfile];
+  const ads = ADS[currentProfile][currentSearch];
+
+  /* Barra di ricerca */
+  $("search-display").innerHTML = search.label + '<span class="cursor"></span>';
+
+  /* Etichetta profilo */
+  $("profile-tag").textContent = "Profilo: " + profile.label;
+
+  /* Annunci */
+  const grid = $("ads-grid");
+  grid.innerHTML = "";
+  ads.forEach(ad => {
+    const el = document.createElement("article");
+    el.className = "ad";
+    el.innerHTML =
+      '<span class="corner">×</span>' +
+      '<span class="sponsored">Annuncio</span>' +
+      '<span class="brand">' + ad.brand + '</span>' +
+      '<span class="headline">' + ad.headline + '</span>' +
+      '<span class="cta">' + ad.cta + '</span>';
+    grid.appendChild(el);
+  });
+
+  /* Spiegazione */
+  const ul = $("why-list");
+  ul.innerHTML = "";
+  profile.why.forEach(w => {
+    const li = document.createElement("li");
+    li.textContent = w;
+    ul.appendChild(li);
+  });
+}
+
+/* ================================================================
+   3. PROFILO LIVE — segnali reali dal browser
+   ================================================================ */
+
+function addSignal(container, key, value){
+  if (value === null || value === undefined || value === "") return;
+  const row = document.createElement("div");
+  row.className = "sig-row";
+  row.innerHTML = '<span class="k">' + key + '</span><span class="v">' + value + '</span>';
+  container.appendChild(row);
+}
+
+function renderLiveProfile(){
+  const tech = $("signals-tech");
+  const ctx  = $("signals-context");
+
+  const ua = navigator.userAgent;
+  const mobile = /Mobi|Android|iPhone/i.test(ua);
+
+  const deviceType = mobile
+    ? (screen.width < 420 ? "Smartphone compatto" : "Smartphone")
+    : (navigator.maxTouchPoints > 1 && /Mac/.test(ua) ? "Tablet (in modalità desktop)" : "Computer desktop o laptop");
+
+  const osName =
+    /Windows/i.test(ua) ? "Windows" :
+    /Mac OS X/i.test(ua) ? "macOS" :
+    /Android/i.test(ua) ? "Android" :
+    /iPhone|iPad/i.test(ua) ? "iOS" :
+    /Linux/i.test(ua) ? "Linux" : "non riconosciuto";
+
+  const browserName =
+    /Edg\//i.test(ua) ? "Microsoft Edge" :
+    /OPR\//i.test(ua) ? "Opera" :
+    /Firefox\//i.test(ua) ? "Firefox" :
+    /Chrome\//i.test(ua) ? "Chrome" :
+    /Safari\//i.test(ua) ? "Safari" : "non riconosciuto";
+
+  const tz = (() => {
+    try { return Intl.DateTimeFormat().resolvedOptions().timeZone; }
+    catch(e){ return "non disponibile"; }
+  })();
+
+  const lang = navigator.language || "non dichiarata";
+  const langs = (navigator.languages || [lang]).slice(0, 3).join(", ");
+
+  const cores = navigator.hardwareConcurrency || null;
+  const ram = navigator.deviceMemory || null;
+
+  const isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const touch = navigator.maxTouchPoints > 0;
+
+  /* --- Segnali tecnici --- */
+  addSignal(tech, "Tipo di dispositivo", deviceType);
+  addSignal(tech, "Sistema operativo", osName);
+  addSignal(tech, "Browser", browserName);
+  addSignal(tech, "Lingua dichiarata", lang);
+  addSignal(tech, "Lingue preferite", langs);
+  addSignal(tech, "Risoluzione schermo", screen.width + " × " + screen.height);
+  addSignal(tech, "Densità pixel", window.devicePixelRatio.toFixed(1) + "x");
+  addSignal(tech, "Dimensione finestra", window.innerWidth + " × " + window.innerHeight);
+  if (cores) addSignal(tech, "Processori logici", cores);
+  if (ram) addSignal(tech, "Memoria stimata", ram + " GB");
+  addSignal(tech, "Touch supportato", touch ? "sì" : "no");
+  addSignal(tech, "Tema preferito", isDark ? "scuro" : "chiaro");
+  addSignal(tech, "Movimento ridotto", reducedMotion ? "sì" : "no");
+
+  /* --- Contesto della visita --- */
+  const now = new Date();
+  const hour = now.getHours();
+  const timeBand =
+    hour < 6  ? "notte fonda" :
+    hour < 12 ? "mattina" :
+    hour < 14 ? "pausa pranzo" :
+    hour < 18 ? "pomeriggio" :
+    hour < 22 ? "sera" : "tarda sera";
+
+  addSignal(ctx, "Fuso orario", tz);
+  addSignal(ctx, "Ora locale", String(hour).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0"));
+  addSignal(ctx, "Fascia della giornata", timeBand);
+  addSignal(ctx, "Giorno", now.toLocaleDateString("it-IT", {weekday:"long"}));
+  addSignal(ctx, "Online", navigator.onLine ? "sì" : "no");
+  if (navigator.connection){
+    if (navigator.connection.effectiveType) addSignal(ctx, "Qualità connessione", navigator.connection.effectiveType);
+    if (navigator.connection.saveData !== undefined) addSignal(ctx, "Risparmio dati", navigator.connection.saveData ? "attivo" : "no");
+  }
+  addSignal(ctx, "Cookie abilitati", navigator.cookieEnabled ? "sì" : "no");
+  addSignal(ctx, "Larghezza pagina", document.documentElement.clientWidth + " px");
+  addSignal(ctx, "Profondità cronologia", history.length);
+
+  /* --- Deduzioni --- */
+  const ded = $("deductions");
+
+  const countryHint = (() => {
+    if (/Europe\//.test(tz)) return "Europa";
+    if (/America\//.test(tz)) return "Americhe";
+    if (/Asia\//.test(tz)) return "Asia";
+    if (/Africa\//.test(tz)) return "Africa";
+    if (/Australia|Pacific/.test(tz)) return "Oceania";
+    return "non determinabile";
+  })();
+
+  const priceBand =
+    cores >= 8 && (ram === null || ram >= 8) ? "medio-alta" :
+    cores >= 4 ? "media" : "modesta";
+
+  const techProfile =
+    /Firefox/.test(ua) ? "utente attento alla privacy" :
+    /Edg/.test(ua)   ? "utente integrato nell'ecosistema Microsoft" :
+    /Safari/.test(ua) && /Mac/.test(ua) ? "utente ecosistema Apple" :
+    /Chrome/.test(ua) ? "utente mainstream" : "profilo non classificato";
+
+  const items = [
+    "Sei probabilmente in " + countryHint + ", fuso orario <strong>" + tz + "</strong>.",
+    "Parli <strong>" + lang + "</strong>: annunci e contenuti ti verranno mostrati in questa lingua.",
+    "Stai navigando da <strong>" + deviceType.toLowerCase() + "</strong> con " + osName + ".",
+    "Sono le <strong>" + String(hour).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0") + "</strong>: fascia <em>" + timeBand + "</em>. Il tipo di annuncio cambia con l'orario.",
+    "Il tuo dispositivo è di fascia <strong>" + priceBand + "</strong>: prodotti e prezzi proposti si adattano.",
+    "Profilo tecnologico: <strong>" + techProfile + "</strong>.",
+    "Tema preferito: <strong>" + (isDark ? "scuro" : "chiaro") + "</strong>" + (reducedMotion ? ", movimento ridotto" : "") + ". Le tue impostazioni di accessibilità sono visibili.",
+    "Comportamento: resterai su questa pagina un certo tempo, farai scroll, cliccherai. Tutto misurabile."
+  ];
+
+  ded.innerHTML = items.map(t => "<li>" + t + "</li>").join("");
+}
+
+/* ================================================================
+   4. QUIZ
+   ================================================================ */
+
+const QUIZ = [
+  {
+    q: "Due amici nella stessa città, nello stesso momento, cercano «scarpe da ginnastica» su Google. Cosa vedono?",
+    options: [
+      "Esattamente gli stessi annunci, perché la ricerca è identica",
+      "Annunci diversi, perché il sistema li ha già classificati in base al loro comportamento passato",
+      "Nessun annuncio, perché la ricerca è troppo generica",
+      "Solo annunci di scarpe, sempre gli stessi per tutti"
+    ],
+    correct: 1,
+    why: "La ricerca è identica, ma il sistema sa che uno è studente e l'altro è manager: al primo mostrerà sneakers da 30€, al secondo mocassini di lusso. L'annuncio non dipende dalla ricerca, dipende dal profilo."
+  },
+  {
+    q: "Se rifiuti tutti i cookie, sei al sicuro dalla profilazione pubblicitaria?",
+    options: [
+      "Sì, senza cookie nessuno può profilarmi",
+      "No: esistono altre tecniche, come il fingerprinting del dispositivo, che non richiedono cookie",
+      "Sì, perché i cookie sono l'unico strumento di tracciamento esistente",
+      "Dipende solo dal browser che uso"
+    ],
+    correct: 1,
+    why: "Il fingerprinting combina caratteristiche tecniche del tuo dispositivo (schermo, lingua, fuso orario, font, GPU) per riconoscerti anche senza cookie. La modalità in incognito cancella i cookie, non il tuo dispositivo."
+  },
+  {
+    q: "Cos'è il «retargeting»?",
+    options: [
+      "Mostrare annunci casuali a chiunque navighi",
+      "Mostrare a una persona un annuncio di un prodotto che ha già visto o cercato, per riportarla al sito",
+      "Cambiare il prezzo di un prodotto in base all'utente",
+      "Tradurre gli annunci in più lingue"
+    ],
+    correct: 1,
+    why: "Il retargeting (o remarketing) è il meccanismo per cui, dopo aver guardato un paio di scarpe, quel paio ti segue per giorni su siti diversi. Serve a recuperare i carrelli abbandonati e a insistere su un interesse già mostrato."
+  },
+  {
+    q: "Quale di questi NON è un segnale tipicamente usato per profilare un utente online?",
+    options: [
+      "La lingua del browser e il fuso orario",
+      "La risoluzione dello schermo e il tipo di dispositivo",
+      "Il colore degli occhi e il gruppo sanguigno",
+      "Le pagine visitate e il tempo di permanenza"
+    ],
+    correct: 2,
+    why: "Colore degli occhi e gruppo sanguigno non sono dati disponibili al browser. Tutto il resto, invece, sì: lingua, fuso orario, risoluzione, dispositivo e comportamento sono segnali reali e ampiamente usati."
+  },
+  {
+    q: "Perché un annuncio di scarpe continua a seguirti per settimane, anche su siti completamente diversi?",
+    options: [
+      "Perché il sito delle scarpe ha comprato tutti gli altri siti",
+      "Perché una rete pubblicitaria condivisa ha collegato la tua visita a un identificatore e lo mostra su tutti i siti che aderiscono",
+      "Perché il browser ha una funzione che mostra sempre gli ultimi prodotti cercati",
+      "Perché è un caso"
+    ],
+    correct: 1,
+    why: "Le grandi reti pubblicitarie (Google, Meta, e molte altre) gestiscono annunci su milioni di siti. Quando visiti un sito che le usa, il tuo identificatore viene collegato a quell'interesse: da lì in poi, l'annuncio ti segue ovunque nella stessa rete."
+  },
+  {
+    q: "Una marca ha 5.000 clienti fedeli. Chiede alla piattaforma: «trovami altre 50.000 persone simili a loro». Come si chiama questa tecnica?",
+    options: [
+      "Retargeting",
+      "Pubblico simile (lookalike audience)",
+      "Test A/B",
+      "SEO"
+    ],
+    correct: 1,
+    why: "Il pubblico simile (o lookalike) è una tecnica predittiva: la piattaforma analizza i segnali dei clienti esistenti e cerca milioni di altri utenti che presentano pattern comportamentali simili, anche se non hanno mai interagito con la marca."
+  }
+];
+
+let quizState = {
+  current: 0,
+  answered: false,
+  score: 0,
+  completed: false
+};
+
+function renderQuiz(){
+  const wrap = $("quiz-questions");
+  wrap.innerHTML = "";
+
+  QUIZ.forEach((q, i) => {
+    const el = document.createElement("div");
+    el.className = "question";
+    if (i === quizState.current) el.classList.add("active");
+    el.dataset.index = i;
+
+    const opts = q.options.map((o, j) =>
+      '<button class="option" data-i="' + i + '" data-j="' + j + '">' +
+        '<span class="letter">' + String.fromCharCode(65 + j) + '</span>' +
+        '<span>' + o + '</span>' +
+      '</button>'
+    ).join("");
+
+    el.innerHTML =
+      '<span class="q-num">Domanda ' + (i + 1) + ' di ' + QUIZ.length + '</span>' +
+      '<p class="q-text">' + q.q + '</p>' +
+      '<div class="options">' + opts + '</div>' +
+      '<div class="feedback" data-fb="' + i + '"></div>';
+
+    wrap.appendChild(el);
+  });
+
+  /* Listener */
+  wrap.querySelectorAll(".option").forEach(btn => {
+    btn.addEventListener("click", () => handleAnswer(parseInt(btn.dataset.i), parseInt(btn.dataset.j)));
+  });
+
+  updateProgress();
+}
+
+function updateProgress(){
+  const pct = ((quizState.current) / QUIZ.length) * 100;
+  $("progress-fill").style.width = pct + "%";
+  $("progress-label").textContent =
+    quizState.completed
+      ? "Completato"
+      : "Domanda " + (quizState.current + 1) + " di " + QUIZ.length;
+}
+
+function handleAnswer(qi, oi){
+  if (quizState.answered) return;
+  if (qi !== quizState.current) return;
+
+  quizState.answered = true;
+
+  const q = QUIZ[qi];
+  const qEl = document.querySelector('.question[data-index="' + qi + '"]');
+  const buttons = qEl.querySelectorAll(".option");
+  const fb = qEl.querySelector('.feedback[data-fb="' + qi + '"]');
+
+  buttons.forEach((b, j) => {
+    b.classList.add("locked");
+    if (j === q.correct) b.classList.add("correct");
+    else if (j === oi)   b.classList.add("wrong");
+  });
+
+  const isCorrect = oi === q.correct;
+  if (isCorrect) quizState.score++;
+
+  fb.className = "feedback show " + (isCorrect ? "good" : "bad");
+  fb.innerHTML =
+    "<strong>" + (isCorrect ? "✓ Corretto." : "✗ Non è questa.") + "</strong> " + q.why;
+
+  const nextBtn = $("next-btn");
+  nextBtn.disabled = false;
+  nextBtn.textContent =
+    quizState.current === QUIZ.length - 1 ? "Vedi il risultato →" : "Avanti →";
+}
+
+function goNext(){
+  if (!quizState.answered) return;
+
+  if (quizState.current === QUIZ.length - 1){
+    finishQuiz();
+    return;
+  }
+
+  quizState.current++;
+  quizState.answered = false;
+
+  document.querySelectorAll(".question").forEach(q => {
+    q.classList.toggle("active", parseInt(q.dataset.index) === quizState.current);
+  });
+
+  $("next-btn").disabled = true;
+  $("next-btn").textContent = "Avanti →";
+  updateProgress();
+}
+
+function finishQuiz(){
+  quizState.completed = true;
+  document.querySelectorAll(".question").forEach(q => q.classList.remove("active"));
+  $("quiz-nav").style.display = "none";
+  updateProgress();
+
+  const result = $("quiz-result");
+  result.classList.add("show");
+
+  const score = quizState.score;
+  const total = QUIZ.length;
+  $("result-score").textContent = score + "/" + total;
+
+  let title, text;
+  if (score === total){
+    title = "Perfetto: hai capito il meccanismo.";
+    text = "Sai riconoscere le tecniche principali e sai che la profilazione non dipende da un solo segnale, ma dalla loro combinazione.";
+  } else if (score >= total - 1){
+    title = "Molto bene.";
+    text = "Hai colto i punti chiave. Rileggi con calma le domande che hai sbagliato: spesso la risposta sta nella differenza tra un singolo dato e l'insieme dei dati.";
+  } else if (score >= total / 2){
+    title = "Buona base, ma qualcosa sfugge.";
+    text = "Vale la pena rileggere la sezione «Come funziona, in sei idee» e rifare il quiz: i concetti di retargeting, lookalike e concatenazione sono i più utili da interiorizzare.";
+  } else {
+    title = "Ripartiamo dalle basi.";
+    text = "Il tema è vasto e controintuitivo: non preoccuparti. Torna al laboratorio, cambia profilo e osserva come cambiano gli annunci. Poi rileggi le sei idee e rifai il quiz.";
+  }
+  $("result-title").textContent = title;
+  $("result-text").textContent = text;
+}
+
+function restartQuiz(){
+  quizState = { current: 0, answered: false, score: 0, completed: false };
+  $("quiz-result").classList.remove("show");
+  $("quiz-nav").style.display = "flex";
+  $("next-btn").disabled = true;
+  $("next-btn").textContent = "Avanti →";
+  renderQuiz();
+}
+
+/* ================================================================
+   5. AVVIO
+   ================================================================ */
+function init(){
+  /* Laboratorio */
+  buildChips();
+  updateChips();
+  renderLab();
+
+  /* Profilo live */
+  renderLiveProfile();
+
+  /* Quiz */
+  renderQuiz();
+  $("next-btn").addEventListener("click", goNext);
+  $("restart-btn").addEventListener("click", restartQuiz);
+}
+
+init();
+</script>
+
+</body>
+</html>
