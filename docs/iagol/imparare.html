@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imparare il Machine Learning con LLM e Google Colab</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.65;
+    color: #1f2937;
+    background: #f9fafb;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    padding: 3rem 1.5rem 2.5rem;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 .5rem; font-size: 2rem; }
+  header p { margin: 0; opacity: .95; font-size: 1.1rem; }
+  main {
+    max-width: 850px;
+    margin: -1.5rem auto 3rem;
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  }
+  h2 {
+    color: #4f46e5;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: .4rem;
+    margin-top: 2.5rem;
+  }
+  h3 { color: #374151; margin-top: 1.6rem; }
+  p, li { font-size: 1.02rem; }
+  code {
+    background: #f3f4f6;
+    padding: .1rem .4rem;
+    border-radius: 4px;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: .92em;
+    color: #be123c;
+  }
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: .9rem;
+    line-height: 1.5;
+  }
+  pre code { background: transparent; color: inherit; padding: 0; }
+  .box {
+    background: #eef2ff;
+    border-left: 4px solid #4f46e5;
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0;
+    border-radius: 6px;
+  }
+  .box.warn { background: #fef3c7; border-color: #f59e0b; }
+  .box.tip  { background: #ecfdf5; border-color: #10b981; }
+  .box strong { color: #111827; }
+  ol li, ul li { margin: .4rem 0; }
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps > li {
+    position: relative;
+    padding-left: 3.2rem;
+    margin: 1.2rem 0;
+  }
+  .steps > li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 0;
+    width: 2.3rem; height: 2.3rem;
+    background: #4f46e5;
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  a { color: #4f46e5; }
+  footer {
+    text-align: center;
+    color: #6b7280;
+    font-size: .9rem;
+    padding: 1rem;
+  }
+  .prompt-example {
+    background: #f5f3ff;
+    border: 1px dashed #a78bfa;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    font-style: italic;
+    color: #4c1d95;
+    margin: 1rem 0;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th, td { padding: .6rem .8rem; border: 1px solid #e5e7eb; text-align: left; }
+  th { background: #f3f4f6; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🤖 Imparare il Machine Learning con gli LLM e Google Colab</h1>
+  <p>Una guida pratica per chi parte da zero</p>
+</header>
+
+<main>
+
+  <h2>🎯 Obiettivo della lezione</h2>
+  <p>
+    In questa lezione useremo <strong>due strumenti</strong> che, combinati, rendono il Machine Learning
+    accessibile anche a chi non ha mai programmato:
+  </p>
+  <ul>
+    <li><strong>Un LLM</strong> (ChatGPT, Claude, Gemini…): il nostro "tutor personale" che spiega, suggerisce e corregge.</li>
+    <li><strong>Google Colab</strong>: un ambiente dove <em>eseguire</em> codice Python direttamente dal browser, senza installare nulla.</li>
+  </ul>
+  <p>
+    Impareremo facendo: leggeremo un po' di codice, lo eseguiremo, vedremo i risultati e — soprattutto — 
+    <strong>faremo domande all'LLM</strong> ogni volta che qualcosa non è chiaro.
+  </p>
+
+  <div class="box">
+    <strong>Idea chiave:</strong> non devi saper programmare per iniziare. Devi saper <em>fare buone domande</em> 
+    e saper <em>leggere i risultati</em>. L'LLM si occupa della sintassi, tu ti occupi del ragionamento.
+  </div>
+
+  <h2>🧰 Cosa ti serve</h2>
+  <ul>
+    <li>Un computer con browser (Chrome, Firefox, Safari…).</li>
+    <li>Un account Google (gratuito) per usare Colab.</li>
+    <li>Accesso a un LLM (ChatGPT, Claude, Gemini, Copilot… — anche la versione gratuita va benissimo).</li>
+  </ul>
+  <p>Nessuna installazione. Nessun file da scaricare. Tutto avviene nel browser.</p>
+
+  <h2>📚 Concetti in 30 secondi</h2>
+  <p>Prima di toccare il codice, chiariamo tre parole che sentirai spesso:</p>
+  <table>
+    <tr><th>Termine</th><th>Significato semplice</th></tr>
+    <tr><td><strong>Modello</strong></td><td>Una "formula" che impara dai dati. Es: "dato il numero di stanze, stima il prezzo di una casa".</td></tr>
+    <tr><td><strong>Addestrare</strong></td><td>Mostrare al modello tanti esempi (input → output) così che impari la regola.</td></tr>
+    <tr><td><strong>Predire</strong></td><td>Usare il modello addestrato per dare una risposta su un caso nuovo.</td></tr>
+  </table>
+
+  <h2>🚀 Passo per passo</h2>
+
+  <ol class="steps">
+    <li>
+      <h3>Apri Google Colab</h3>
+      <p>
+        Vai su <a href="https://colab.research.google.com" target="_blank" rel="noopener">colab.research.google.com</a> 
+        e clicca <em>"Nuovo notebook"</em>. Vedrai una pagina con delle celle rettangolari: quelle sono i 
+        <strong>blocchi di codice</strong> che eseguiremo.
+      </p>
+      <p>Per eseguire una cella: clicca dentro e premi <code>Shift + Invio</code> (oppure il pulsante ▶ a sinistra).</p>
+    </li>
+
+    <li>
+      <h3>Prima cella: allenati con l'LLM</h3>
+      <p>Prima ancora di scrivere codice, chiedi all'LLM di spiegarti cosa stiamo per fare:</p>
+      <div class="prompt-example">
+        "Spiegami come se avessi 14 anni cosa fa un modello di regressione lineare, 
+        con un esempio tratto dalla vita quotidiana. Poi mostrami un esempio di codice Python 
+        in 10 righe che lo implementa."
+      </div>
+      <p>Leggi la risposta, poi copia il codice nella prima cella di Colab.</p>
+    </li>
+
+    <li>
+      <h3>Esegui il codice</h3>
+      <p>Premi <code>Shift + Invio</code>. Sotto la cella apparirà l'output (numeri, grafici…).</p>
+      <div class="box warn">
+        <strong>Se compare un errore</strong> (testo rosso): non spaventarti. 
+        Copialo e incollalo all'LLM dicendo: <em>"Ho questo errore, cosa significa e come lo risolvo?"</em>. 
+        È il modo più rapido per imparare.
+      </div>
+    </li>
+
+    <li>
+      <h3>Esperimento guidato: la regressione lineare</h3>
+      <p>
+        Ora facciamo un esempio classico. Immagina di voler prevedere il <strong>prezzo di una pizza</strong> 
+        in base al suo <strong>diametro</strong>. Incolla questo codice in una nuova cella:
+      </p>
+<pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+# 1. I nostri dati di esempio (diametro in cm, prezzo in €)
+diametro = np.array([[20], [25], [30], [35], [40], [45], [50]])
+prezzo   = np.array([ 5,    6,    8,    9,   11,   12,   14])
+
+# 2. Creiamo e addestriamo il modello
+modello = LinearRegression()
+modello.fit(diametro, prezzo)
+
+# 3. Facciamo una previsione per una pizza da 33 cm
+nuovo = np.array([[33]])
+previsione = modello.predict(nuovo)
+print(f"Prezzo previsto per una pizza da 33 cm: {previsione[0]:.2f} €")
+
+# 4. Disegniamo i dati e la retta trovata
+plt.scatter(diametro, prezzo, color="orange", label="Dati reali")
+plt.plot(diametro, modello.predict(diametro), color="blue", label="Modello")
+plt.xlabel("Diametro (cm)")
+plt.ylabel("Prezzo (€)")
+plt.legend()
+plt.title("Prezzo della pizza in base al diametro")
+plt.show()
+</code></pre>
+      <p>
+        Esegui. Vedrai apparire un grafico con dei puntini arancioni (i dati) e una linea blu 
+        (la "regola" che il modello ha imparato).
+      </p>
+    </li>
+
+    <li>
+      <h3>Interpreta e chiedi all'LLM</h3>
+      <p>Ecco alcune domande che puoi porre all'LLM per capire meglio:</p>
+      <ul>
+        <li>"Perché nel codice ci sono due <code>[[]]</code> attorno ai numeri del diametro?"</li>
+        <li>"Cosa succede se cambio i prezzi nei dati? Posso prevedere cose diverse?"</li>
+        <li>"Che differenza c'è tra la riga <code>fit</code> e la riga <code>predict</code>?"</li>
+        <li>"Cosa significa 'regressione lineare' in termini matematici?"</li>
+      </ul>
+      <div class="box tip">
+        <strong>Consiglio:</strong> non accettare mai la prima risposta se non ti è chiara. 
+        Chiedi: <em>"Puoi rispiegarmelo con parole ancora più semplici?"</em> oppure 
+        <em>"Fammi un esempio concreto, diverso dal precedente."</em>
+      </div>
+    </li>
+
+    <li>
+      <h3>Modifica tu stesso il codice</h3>
+      <p>
+        Ora tocca a te. Prova a cambiare:
+      </p>
+      <ul>
+        <li>I numeri del <code>diametro</code> o del <code>prezzo</code>.</li>
+        <li>Il valore della pizza da prevedere (da <code>33</code> a un altro numero).</li>
+        <li>Aggiungi un nuovo punto di dati.</li>
+      </ul>
+      <p>
+        Dopo ogni modifica, esegui di nuovo e osserva cosa cambia. Se qualcosa non funziona, 
+        chiedi all'LLM: <em>"Ho modificato questa riga in questo modo, ma ottengo questo errore. Perché?"</em>
+      </p>
+    </li>
+  </ol>
+
+  <h2>🎓 Cosa hai imparato finora</h2>
+  <ul>
+    <li>Come <strong>eseguire codice</strong> in un ambiente cloud (Colab).</li>
+    <li>Come <strong>usare un LLM</strong> come tutor per capire, non solo per copiare.</li>
+    <li>La struttura base di un modello di ML: <em>dati → addestramento → previsione</em>.</li>
+    <li>Che l'errore non è un fallimento: è il punto di partenza per imparare.</li>
+  </ul>
+
+  <h2>🛠️ Esercizi proposti</h2>
+
+  <h3>Esercizio 1 — Altre variabili</h3>
+  <p>
+    Chiedi all'LLM di generare un esempio simile ma con <strong>due variabili di input</strong> 
+    (es. diametro <em>e</em> spessore della pizza per prevedere il prezzo). 
+    Fatti spiegare perché in questo caso si parla di "regressione multipla".
+  </p>
+
+  <h3>Esercizio 2 — Classificazione</h3>
+  <p>
+    Chiedi all'LLM: <em>"Mostrami un esempio di classificazione (non di regressione) 
+    con dataset piccolo, spiegato passo passo."</em>. Una buona idea: distinguere mele da arance 
+    in base al peso e al diametro.
+  </p>
+
+  <h3>Esercizio 3 — Conoscere i propri limiti</h3>
+  <p>
+    Chiedi all'LLM: <em>"Quali sono i principali limiti di un modello di regressione lineare? 
+    Fammi un esempio in cui sbaglia completamente."</em>. Poi prova a costruirlo in Colab.
+  </p>
+
+  <h2>⚠️ Errori comuni dei principianti</h2>
+  <ul>
+    <li><strong>Copiare senza capire.</strong> Se l'LLM ti dà 100 righe, chiedigliene 10. Meglio poche righe comprese che cento righe misteriose.</li>
+    <li><strong>Fidarsi ciecamente dell'LLM.</strong> Gli LLM possono inventare ("allucinare"). Verifica sempre eseguendo il codice in Colab.</li>
+    <li><strong>Arrendersi al primo errore.</strong> Ogni programmatore, anche esperto, combatte ogni giorno con gli errori. Fanno parte del mestiere.</li>
+    <li><strong>Saltare la fase di interpretazione.</strong> Un grafico o un numero senza spiegazione non insegna nulla. Chiediti sempre <em>"cosa significa?"</em>.</li>
+  </ul>
+
+  <h2>✅ Riepilogo della strategia</h2>
+  <ol>
+    <li>Chiedi all'LLM un concetto <strong>spiegato semplice</strong>.</li>
+    <li>Fatti dare un <strong>esempio di codice breve</strong>.</li>
+    <li>Eseguilo in <strong>Colab</strong>.</li>
+    <li><strong>Modificalo</strong> per vedere cosa cambia.</li>
+    <li>Fai domande su ogni <strong>errore</strong> e ogni <strong>risultato strano</strong>.</li>
+    <li>Ripeti con un concetto nuovo.</li>
+  </ol>
+
+  <div class="box">
+    Questo ciclo — <strong>spiegazione → esecuzione → modifica → domanda</strong> — è il cuore 
+    dell'apprendimento in un mondo dove gli LLM sono sempre a disposizione. Non serve memorizzare: 
+    serve <em>saper ragionare con gli strumenti giusti</em>.
+  </div>
+
+  <h2>🔗 Risorse utili</h2>
+  <ul>
+    <li><a href="https://colab.research.google.com" target="_blank" rel="noopener">Google Colab</a> — ambiente di esecuzione</li>
+    <li><a href="https://scikit-learn.org/stable/" target="_blank" rel="noopener">scikit-learn</a> — libreria di ML usata nell'esempio</li>
+    <li><a href="https://matplotlib.org/" target="_blank" rel="noopener">matplotlib</a> — per i grafici</li>
+    <li><a href="https://numpy.org/" target="_blank" rel="noopener">numpy</a> — per i calcoli numerici</li>
+  </ul>
+
+</main>
+
+<footer>
+  Lezione introduttiva — Machine Learning con LLM e Google Colab
+</footer>
+
+</body>
+</html>
