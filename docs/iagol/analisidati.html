@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analisi dei dati con LLM, Excel e Google Colab — Lezione per principianti</title>
+<style>
+  :root{
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --ink:#1b2233;
+    --muted:#5a6478;
+    --accent:#4f46e5;
+    --accent-soft:#eef0ff;
+    --teal:#0d9488;
+    --teal-soft:#e6f7f5;
+    --amber:#b45309;
+    --amber-soft:#fef4e6;
+    --rose:#be123c;
+    --rose-soft:#fdeef2;
+    --border:#e2e6ef;
+    --code-bg:#1e2438;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(20,25,45,.05), 0 8px 24px -12px rgba(20,25,45,.18);
+  }
+
+  *{box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- HEADER ---------- */
+  header.top{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .top-inner{
+    max-width:1150px; margin:0 auto; padding:14px 24px;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .logo{
+    width:38px; height:38px; border-radius:11px; flex:none;
+    background:linear-gradient(135deg,var(--accent),var(--teal));
+    display:grid; place-items:center; color:#fff; font-weight:700; font-size:19px;
+  }
+  .top-title{font-weight:700; font-size:1.02rem; letter-spacing:-.01em;}
+  .top-sub{font-size:.82rem; color:var(--muted); margin-top:-3px;}
+  .badge{
+    margin-left:auto; font-size:.75rem; font-weight:600;
+    background:var(--accent-soft); color:var(--accent);
+    padding:5px 11px; border-radius:999px; white-space:nowrap;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    max-width:1150px; margin:0 auto; padding:52px 24px 12px;
+  }
+  .hero h1{
+    font-size:clamp(1.8rem, 4.2vw, 2.7rem);
+    line-height:1.15; letter-spacing:-.025em; margin:0 0 16px;
+    max-width:20ch;
+  }
+  .hero h1 em{
+    font-style:normal;
+    background:linear-gradient(120deg,var(--accent),var(--teal));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero p.lead{
+    font-size:1.08rem; color:var(--muted); max-width:62ch; margin:0 0 22px;
+  }
+  .pill-row{display:flex; gap:9px; flex-wrap:wrap;}
+  .pill{
+    font-size:.82rem; font-weight:600; padding:6px 13px; border-radius:999px;
+    background:#fff; border:1px solid var(--border); color:var(--muted);
+  }
+
+  /* ---------- LAYOUT ---------- */
+  .layout{
+    max-width:1150px; margin:0 auto; padding:30px 24px 80px;
+    display:grid; grid-template-columns:225px 1fr; gap:48px;
+    align-items:start;
+  }
+
+  /* ---------- TOC ---------- */
+  nav.toc{
+    position:sticky; top:86px; align-self:start;
+    font-size:.88rem;
+  }
+  nav.toc .toc-title{
+    font-size:.7rem; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); font-weight:700; margin-bottom:12px;
+  }
+  nav.toc a{
+    display:block; padding:6px 12px; border-radius:9px;
+    color:var(--muted); text-decoration:none; border-left:2px solid transparent;
+    transition:.15s;
+  }
+  nav.toc a:hover{background:#fff; color:var(--ink);}
+  nav.toc a.active{
+    background:#fff; color:var(--accent); font-weight:600;
+    border-left-color:var(--accent); box-shadow:var(--shadow);
+  }
+
+  /* ---------- CONTENT ---------- */
+  main{min-width:0;}
+  section{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); padding:30px 32px; margin-bottom:24px;
+    box-shadow:var(--shadow); scroll-margin-top:90px;
+  }
+  section > h2{
+    font-size:1.35rem; letter-spacing:-.02em; margin:0 0 6px;
+    display:flex; align-items:baseline; gap:12px;
+  }
+  .num{
+    flex:none; font-size:.78rem; font-weight:700; color:#fff;
+    background:var(--accent); width:26px; height:26px; border-radius:8px;
+    display:inline-grid; place-items:center; transform:translateY(-2px);
+  }
+  h3{font-size:1.06rem; margin:26px 0 8px; letter-spacing:-.01em;}
+  h4{font-size:.95rem; margin:20px 0 6px;}
+  p{margin:0 0 14px;}
+  ul,ol{margin:0 0 14px; padding-left:22px;}
+  li{margin-bottom:6px;}
+  strong{font-weight:650;}
+  code.inline{
+    background:#eef0f6; border:1px solid var(--border);
+    padding:1px 6px; border-radius:6px;
+    font-family:ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size:.87em; color:#3b3f52;
+  }
+
+  /* ---------- CALLOUTS ---------- */
+  .callout{
+    border-radius:11px; padding:14px 18px; margin:18px 0;
+    border-left:4px solid; font-size:.94rem;
+  }
+  .callout p:last-child{margin-bottom:0;}
+  .callout .label{
+    display:block; font-size:.72rem; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; margin-bottom:5px;
+  }
+  .c-info{background:var(--accent-soft); border-color:var(--accent);}
+  .c-info .label{color:var(--accent);}
+  .c-tip{background:var(--teal-soft); border-color:var(--teal);}
+  .c-tip .label{color:var(--teal);}
+  .c-warn{background:var(--amber-soft); border-color:var(--amber);}
+  .c-warn .label{color:var(--amber);}
+  .c-stop{background:var(--rose-soft); border-color:var(--rose);}
+  .c-stop .label{color:var(--rose);}
+
+  /* ---------- TOOL CARDS ---------- */
+  .tools{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:20px 0 8px;}
+  .tool{
+    border:1px solid var(--border); border-radius:12px; padding:16px;
+    background:#fcfcfe;
+  }
+  .tool .icon{
+    width:34px; height:34px; border-radius:10px; display:grid; place-items:center;
+    font-size:17px; margin-bottom:10px; color:#fff;
+  }
+  .tool h4{margin:0 0 4px; font-size:.98rem;}
+  .tool p{font-size:.86rem; color:var(--muted); margin:0;}
+  .i-llm{background:linear-gradient(135deg,#7c3aed,#a855f7);}
+  .i-xls{background:linear-gradient(135deg,#15803d,#22c55e);}
+  .i-col{background:linear-gradient(135deg,#f59e0b,#fbbf24);}
+
+  /* ---------- TABLE ---------- */
+  .table-wrap{overflow-x:auto; margin:18px 0; border-radius:11px; border:1px solid var(--border);}
+  table{border-collapse:collapse; width:100%; font-size:.9rem; background:#fff;}
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--border);}
+  th{
+    background:#f2f4f9; font-weight:650; font-size:.78rem;
+    letter-spacing:.04em; text-transform:uppercase; color:var(--muted);
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#fafbff;}
+
+  /* ---------- CODE ---------- */
+  .code-block{margin:16px 0;}
+  .code-head{
+    display:flex; align-items:center; gap:8px;
+    background:#161b2b; color:#9aa4c0; font-size:.75rem; font-weight:600;
+    padding:8px 14px; border-radius:11px 11px 0 0;
+    letter-spacing:.03em;
+  }
+  .code-head .dot{width:8px;height:8px;border-radius:50%;background:#3a4560;}
+  .code-head .lang{margin-left:auto; color:#6f7a99;}
+  pre{
+    margin:0; background:var(--code-bg); color:#e6e9f5;
+    padding:16px 18px; border-radius:0 0 11px 11px;
+    overflow-x:auto; position:relative;
+    font-family:ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size:.86rem; line-height:1.6;
+  }
+  pre code{font-family:inherit;}
+  .copy-btn{
+    position:absolute; top:10px; right:10px;
+    background:#2c3450; color:#a9b3ce; border:1px solid #3b4566;
+    font-size:.72rem; font-weight:600; padding:4px 10px; border-radius:7px;
+    cursor:pointer; transition:.15s; font-family:inherit;
+  }
+  .copy-btn:hover{background:#3b4566; color:#fff;}
+
+  /* ---------- PROMPT BOX ---------- */
+  .prompt{
+    border-radius:11px; padding:14px 18px; margin:12px 0; font-size:.92rem;
+    border:1px dashed;
+  }
+  .prompt.good{background:var(--teal-soft); border-color:#7fd1c7;}
+  .prompt.bad{background:var(--rose-soft); border-color:#f0a8bb;}
+  .prompt .tag{
+    display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; margin-bottom:6px;
+  }
+  .prompt.good .tag{color:var(--teal);}
+  .prompt.bad .tag{color:var(--rose);}
+  .prompt code{font-family:ui-monospace, Menlo, monospace; font-size:.85em;}
+
+  /* ---------- STEPS ---------- */
+  .steps{counter-reset:s; list-style:none; padding:0; margin:18px 0;}
+  .steps li{
+    counter-increment:s; position:relative; padding-left:44px; margin-bottom:16px;
+  }
+  .steps li::before{
+    content:counter(s);
+    position:absolute; left:0; top:1px;
+    width:28px; height:28px; border-radius:9px;
+    background:var(--accent-soft); color:var(--accent);
+    font-size:.82rem; font-weight:700; display:grid; place-items:center;
+  }
+  .steps li strong{display:block; margin-bottom:2px;}
+
+  /* ---------- CHECKLIST ---------- */
+  .check{list-style:none; padding:0; margin:16px 0;}
+  .check li{margin-bottom:9px;}
+  .check label{
+    display:flex; gap:11px; align-items:flex-start; cursor:pointer;
+    padding:10px 14px; border:1px solid var(--border); border-radius:10px;
+    background:#fcfcfe; transition:.15s; font-size:.94rem;
+  }
+  .check label:hover{border-color:#c7cee0;}
+  .check input{margin-top:4px; width:17px; height:17px; accent-color:var(--accent); flex:none; cursor:pointer;}
+  .check input:checked + span{color:var(--muted); text-decoration:line-through;}
+
+  /* ---------- GLOSSARY ---------- */
+  dl.gloss{margin:18px 0; display:grid; gap:12px;}
+  dl.gloss div{
+    border-left:3px solid var(--border); padding-left:16px;
+  }
+  dl.gloss dt{font-weight:650; font-size:.96rem;}
+  dl.gloss dd{margin:2px 0 0; font-size:.9rem; color:var(--muted);}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--border); background:#fff;
+    padding:28px 24px; text-align:center; color:var(--muted); font-size:.85rem;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr; gap:24px; padding-top:20px;}
+    nav.toc{position:static; background:#fff; border:1px solid var(--border);
+      border-radius:var(--radius); padding:16px 18px;}
+    nav.toc a{border-left:none; padding:5px 0;}
+    nav.toc a.active{box-shadow:none; background:transparent; padding-left:0;}
+    .tools{grid-template-columns:1fr;}
+    section{padding:24px 20px;}
+    .hero{padding-top:34px;}
+    .badge{margin-left:0;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="logo">📊</div>
+    <div>
+      <div class="top-title">Analisi dei dati: il primo passo</div>
+      <div class="top-sub">LLM + Excel + Google Colab, spiegati da zero</div>
+    </div>
+    <span class="badge">Livello: principianti assoluti</span>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Imparare a far <em>parlare i dati</em> con tre strumenti alla portata di tutti</h1>
+  <p class="lead">
+    Non serve saper programmare per iniziare. In questa lezione useremo un assistente
+    intelligente (LLM) come tutor, Excel come palestra per capire i concetti, e Google Colab
+    per il salto verso l'automazione. Ogni strumento copre ciò che gli altri non sanno fare.
+  </p>
+  <div class="pill-row">
+    <span class="pill">⏱️ 2 incontri da 2 ore</span>
+    <span class="pill">🧰 Solo un browser</span>
+    <span class="pill">🎯 Obiettivo: 1 analisi completa</span>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- ================= TOC ================= -->
+  <nav class="toc" aria-label="Indice della lezione">
+    <div class="toc-title">Indice</div>
+    <a href="#obiettivi">1. Cosa saprai fare</a>
+    <a href="#cos-e">2. Che cos'è l'analisi dati</a>
+    <a href="#strumenti">3. I tre strumenti</a>
+    <a href="#metodo">4. Il metodo in 6 passi</a>
+    <a href="#lab">5. Laboratorio: la gelateria</a>
+    <a href="#prompt">6. Scrivere buoni prompt</a>
+    <a href="#errori">7. Errori da evitare</a>
+    <a href="#glossario">8. Glossario minimo</a>
+    <a href="#verifica">9. Verifica finale</a>
+  </nav>
+
+  <!-- ================= MAIN ================= -->
+  <main>
+
+    <!-- ---------- 1 ---------- -->
+    <section id="obiettivi">
+      <h2><span class="num">1</span> Cosa saprai fare alla fine</h2>
+      <p>Questa non è una lezione di informatica: è una lezione di <strong>metodo</strong>.
+      Alla fine dell'incontro dovresti essere in grado di:</p>
+      <ul>
+        <li>Guardare una tabella di numeri e capire <strong>cosa contiene</strong> (righe, colonne, tipi di dato).</li>
+        <li>Fare in Excel le quattro operazioni fondamentali: <strong>sommare, contare, mediare, filtrare</strong>.</li>
+        <li>Aprire Google Colab e far girare <strong>tre righe di codice</strong> senza panico.</li>
+        <li>Usare un LLM per <strong>farsi spiegare</strong> ciò che non capisci — e per controllare se hai sbagliato.</li>
+        <li>Raccontare con una frase che cosa dicono i tuoi dati.</li>
+      </ul>
+
+      <div class="callout c-info">
+        <span class="label">Regola della lezione</span>
+        <p>Ogni volta che non capisci qualcosa, la prima mossa non è alzare la mano: è
+        <strong>chiedere all'LLM</strong>. La seconda mossa è chiedere al docente se la risposta
+        dell'LLM non ti convince. Così impari due volte.</p>
+      </div>
+    </section>
+
+    <!-- ---------- 2 ---------- -->
+    <section id="cos-e">
+      <h2><span class="num">2</span> Che cos'è l'analisi dei dati (detto semplice)</h2>
+
+      <p>Fare analisi dei dati significa rispondere a una <strong>domanda</strong> usando dei
+      <strong>numeri raccolti</strong>. Tutto qui. Il resto sono strumenti.</p>
+
+      <p>Un insieme di dati si chiama <strong>dataset</strong> e assomiglia molto a un foglio
+      di calcolo: ha delle righe e delle colonne.</p>
+
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only" style="position:absolute;left:-9999px;">Esempio di dataset</caption>
+          <thead>
+            <tr><th>Data</th><th>Giorno</th><th>Gusto</th><th>Coni venduti</th><th>Incasso (€)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>01/06</td><td>Lunedì</td><td>Limone</td><td>23</td><td>69,00</td></tr>
+            <tr><td>01/06</td><td>Lunedì</td><td>Cioccolato</td><td>41</td><td>123,00</td></tr>
+            <tr><td>02/06</td><td>Martedì</td><td>Limone</td><td>18</td><td>54,00</td></tr>
+            <tr><td>02/06</td><td>Martedì</td><td>Pistacchio</td><td>37</td><td>129,50</td></tr>
+            <tr><td>03/06</td><td>Mercoledì</td><td>Cioccolato</td><td>52</td><td>156,00</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Le tre domande da farsi davanti a qualsiasi tabella</h3>
+      <ol>
+        <li><strong>Che cosa rappresenta una riga?</strong> Qui: un gusto venduto in un certo giorno.</li>
+        <li><strong>Che cosa rappresenta una colonna?</strong> Qui: una caratteristica di quella vendita.</li>
+        <li><strong>I numeri sono numeri veri?</strong> Attenzione: "01/06" sembra un numero ma è una <em>data</em>. "Limone" è testo. Solo "Coni venduti" e "Incasso" sono quantità su cui puoi fare calcoli.</li>
+      </ol>
+
+      <div class="callout c-tip">
+        <span class="label">Suggerimento</span>
+        <p>Chiedi all'LLM: <em>«Ti incollo una tabella. Dimmi quali colonne contengono numeri,
+        quali testo e quali date, e spiegami perché è importante distinguerle.»</em> Poi incolla
+        i tuoi dati.</p>
+      </div>
+    </section>
+
+    <!-- ---------- 3 ---------- -->
+    <section id="strumenti">
+      <h2><span class="num">3</span> I tre strumenti e perché usarli insieme</h2>
+
+      <p>Ognuno di questi strumenti, da solo, ha un limite. Insieme formano un percorso completo.</p>
+
+      <div class="tools">
+        <div class="tool">
+          <div class="icon i-llm">💬</div>
+          <h4>LLM</h4>
+          <p>ChatGPT, Claude o Gemini. È il <strong>tutor</strong>: spiega, traduce, corregge, fa domande.</p>
+        </div>
+        <div class="tool">
+          <div class="icon i-xls">📗</div>
+          <h4>Excel / Fogli Google</h4>
+          <p>È la <strong>palestra</strong>: vedi i dati, li tocchi, capisci i concetti con le mani.</p>
+        </div>
+        <div class="tool">
+          <div class="icon i-col">🐍</div>
+          <h4>Google Colab</h4>
+          <p>È il <strong>laboratorio</strong>: codice Python nel browser, gratis, senza installare nulla.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Strumento</th><th>A cosa serve</th><th>Cosa impari usandolo</th><th>Limite</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>LLM</strong></td>
+              <td>Farsi spiegare, farsi correggere, generare esercizi</td>
+              <td>Il linguaggio e il metodo dell'analisi dati</td>
+              <td>Può inventare risposte con sicurezza</td>
+            </tr>
+            <tr>
+              <td><strong>Excel</strong></td>
+              <td>Calcolare, filtrare, fare grafici a mano</td>
+              <td>Righe, colonne, formule, tabelle pivot</td>
+              <td>Con 100.000 righe diventa lentissimo</td>
+            </tr>
+            <tr>
+              <td><strong>Colab</strong></td>
+              <td>Ripetere l'analisi su dati grandi, salvare il procedimento</td>
+              <td>Il pensiero "a passi", l'automazione</td>
+              <td>Richiede di scrivere (o incollare) codice</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout c-warn">
+        <span class="label">Attenzione</span>
+        <p>L'LLM <strong>non è una calcolatrice affidabile</strong>. Usalo per capire
+        <em>come</em> si fa una cosa, poi fai fare il calcolo a Excel o a Colab. I numeri
+        veri li producono gli strumenti, non la chat.</p>
+      </div>
+    </section>
+
+    <!-- ---------- 4 ---------- -->
+    <section id="metodo">
+      <h2><span class="num">4</span> Il metodo in 6 passi</h2>
+      <p>Qualunque analisi dati, dal negozio di quartiere alla multinazionale, segue questi sei passi.</p>
+
+      <ol class="steps">
+        <li><strong>La domanda.</strong> Prima di toccare i dati: che cosa voglio sapere?
+        «Quale gusto mi fa guadagnare di più?» è una domanda. «Analizziamo i dati» non lo è.</li>
+
+        <li><strong>I dati.</strong> Da dove vengono? Chi li ha raccolti? Quanti ne ho? Manca qualcosa?</li>
+
+        <li><strong>La pulizia.</strong> Date scritte in tre modi diversi, celle vuote, "€" attaccato ai numeri.
+        È il passo più noioso e più importante: qui si perde il 60% del tempo.</li>
+
+        <li><strong>L'esplorazione.</strong> Medie, totali, conteggi. Serve a farsi un'idea prima di trarre conclusioni.</li>
+
+        <li><strong>La visualizzazione.</strong> Un grafico a barre dice in un secondo quello che una tabella dice in un minuto.</li>
+
+        <li><strong>La conclusione.</strong> Una frase in italiano, comprensibile a chi non ha visto i dati.
+        Se non riesci a scriverla, l'analisi non è finita.</li>
+      </ol>
+
+      <div class="callout c-info">
+        <span class="label">Da ricordare</span>
+        <p>Il passo 6 è quello che conta. Nessuno paga per una tabella: tutti pagano per una
+        <strong>risposta</strong>.</p>
+      </div>
+    </section>
+
+    <!-- ---------- 5 ---------- -->
+    <section id="lab">
+      <h2><span class="num">5</span> Laboratorio guidato: la gelateria di Nonna Pina</h2>
+
+      <p>Scenario: Nonna Pina ha una gelateria e vuole sapere <strong>quale gusto le conviene
+      produrre di più</strong>. Abbiamo un mese di vendite in un file CSV.</p>
+
+      <h3>Passo A — Capire i dati (con l'LLM)</h3>
+      <p>Apri la chat e scrivi:</p>
+      <div class="prompt good">
+        <span class="tag">Prompt efficace</span>
+        <p>«Sto per analizzare le vendite di una gelateria. Il file ha queste colonne:
+        <code>data, giorno, gusto, coni_venduti, incasso</code>. Sono un principiante.
+        Spiegami in 5 righe che tipo di analisi posso fare e quali domande ha senso porsi.»</p>
+      </div>
+      <p>Leggi la risposta. Non copiarla: usala per decidere <em>tu</em> la domanda.
+      Diciamo che scegliamo: <strong>«Quale gusto incassa di più in totale?»</strong></p>
+
+      <h3>Passo B — Excel: le quattro formule che bastano</h3>
+      <p>Apri il file in Excel o in Fogli Google. Supponi che l'incasso sia nella colonna
+      <code class="inline">E</code>, dalla riga 2 alla riga 301.</p>
+
+      <div class="code-block">
+        <div class="code-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          Excel / Fogli Google <span class="lang">formule</span></div>
+<pre><code>=SOMMA(E2:E301)          → l'incasso totale del mese
+
+=MEDIA(E2:E301)          → l'incasso medio per vendita
+
+=CONTA.VALORI(E2:E301)   → quante vendite ho registrato
+
+=CONTA.SE(C2:C301;"Limone")   → quante volte compare il gusto Limone
+
+=SOMMA.SE(C2:C301;"Limone";E2:E301)  → quanto ha incassato il Limone</code></pre>
+      </div>
+
+      <div class="callout c-tip">
+        <span class="label">Trucco</span>
+        <p>La formula <code class="inline">SOMMA.SE</code> è quella che risponde alla nostra
+        domanda. Chiedi all'LLM: <em>«Spiegami SOMMA.SE come se avessi 10 anni, con un esempio
+        di una gelateria»</em>. Poi prova a riscriverla da solo su un altro gusto.</p>
+      </div>
+
+      <h4>Il salto di qualità: la tabella pivot</h4>
+      <p>Invece di scrivere cinque formule, crea una <strong>tabella pivot</strong>:
+      trascina <em>gusto</em> nelle righe e <em>incasso</em> nei valori. In tre click hai
+      tutti i totali insieme, ordinati dal più alto al più basso. È il momento in cui
+      l'analisi dati smette di sembrare matematica e comincia a sembrare uno strumento.</p>
+
+      <h3>Passo C — Google Colab: le stesse cose, in codice</h3>
+      <p>Vai su <strong>colab.research.google.com</strong>, accedi con un account Google,
+      scegli <em>Nuovo notebook</em>. Un "notebook" è una pagina fatta di celle: scrivi
+      del codice in una cella e premi <strong>▶</strong> per eseguirla.</p>
+
+      <p><strong>Cella 1 — Caricare i dati</strong></p>
+      <div class="code-block">
+        <div class="code-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          Python · Colab <span class="lang">cella 1</span></div>
+<pre><code>import pandas as pd
+
+# Leggiamo il file. Se il file è sul tuo computer, usa il pannello a sinistra per caricarlo.
+df = pd.read_csv("vendite_gelateria.csv")
+
+# Mostriamo le prime 5 righe per controllare che sia tutto a posto
+df.head()</code></pre>
+      </div>
+
+      <div class="callout c-info">
+        <span class="label">Che cosa succede</span>
+        <p><code class="inline">df</code> è il nome che diamo alla nostra tabella.
+        <code class="inline">head()</code> significa "mostrami l'inizio". Se vedi la tabella,
+        hai già vinto: hai letto un file con tre righe di codice.</p>
+      </div>
+
+      <p><strong>Cella 2 — Le domande di base</strong></p>
+      <div class="code-block">
+        <div class="code-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          Python · Colab <span class="lang">cella 2</span></div>
+<pre><code>print("Righe totali:", len(df))
+print("Incasso totale: €", df["incasso"].sum())
+print("Incasso medio: €", round(df["incasso"].mean(), 2))</code></pre>
+      </div>
+
+      <p><strong>Cella 3 — La risposta alla domanda di Nonna Pina</strong></p>
+      <div class="code-block">
+        <div class="code-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          Python · Colab <span class="lang">cella 3</span></div>
+<pre><code># Raggruppa per gusto e somma gli incassi, dal più alto al più basso
+classifica = df.groupby("gusto")["incasso"].sum().sort_values(ascending=False)
+
+print(classifica)</code></pre>
+      </div>
+
+      <p><strong>Cella 4 — Il grafico</strong></p>
+      <div class="code-block">
+        <div class="code-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          Python · Colab <span class="lang">cella 4</span></div>
+<pre><code>classifica.plot(kind="bar", title="Incasso per gusto", color="teal")</code></pre>
+      </div>
+
+      <div class="callout c-tip">
+        <span class="label">Se qualcosa va storto</span>
+        <p>Copia il messaggio di errore rosso e incollalo all'LLM con la frase:
+        <em>«Sto imparando Python. Ho questo errore in Colab, spiegami in parole semplici
+        cosa significa e come risolverlo.»</em> Nel 90% dei casi si tratta di un nome di
+        colonna scritto diversamente o di una virgoletta mancante.</p>
+      </div>
+
+      <h3>Passo D — La conclusione</h3>
+      <p>Ora scrivi una frase. Non un grafico, non una tabella: una frase.</p>
+      <div class="prompt good">
+        <span class="tag">Esempio di conclusione</span>
+        <p>«Nel mese analizzato il pistacchio è il gusto che ha incassato di più, seguito dal
+        cioccolato. Il limone, pur vendendo molti coni, incassa meno perché costa di meno.
+        Conviene quindi non ridurre la produzione di pistacchio.»</p>
+      </div>
+      <p>Questa frase è il prodotto finale del lavoro. Excel e Colab sono solo stati gli attrezzi.</p>
+    </section>
+
+    <!-- ---------- 6 ---------- -->
+    <section id="prompt">
+      <h2><span class="num">6</span> Scrivere buoni prompt per imparare</h2>
+
+      <p>Un LLM risponde bene quanto è scritta bene la domanda. Per imparare, la struttura
+      vincente ha sempre tre pezzi:</p>
+      <ol>
+        <li><strong>Chi sei tu</strong> → «Sono un principiante, non so programmare»</li>
+        <li><strong>Cosa vuoi</strong> → «Spiegami cosa fa questa formula»</li>
+        <li><strong>Come lo vuoi</strong> → «In 5 righe, con un esempio di tutti i giorni»</li>
+      </ol>
+
+      <div class="prompt bad">
+        <span class="tag">✗ Prompt debole</span>
+        <p>«Come si fa l'analisi dati?»</p>
+      </div>
+
+      <div class="prompt good">
+        <span class="tag">✓ Prompt forte</span>
+        <p>«Sono uno studente che non ha mai programmato. Ho una tabella di vendite con le
+        colonne data, gusto, coni_venduti, incasso. Voglio capire quale gusto rende di più.
+        Dimmi in 5 passi cosa dovrei fare, spiegando ogni passaggio con parole semplici.»</p>
+      </div>
+
+      <h4>Le quattro frasi magiche da tenere a portata di mano</h4>
+      <ul>
+        <li><em>«Spiegamelo come se avessi 12 anni.»</em></li>
+        <li><em>«Dammi un esempio concreto con numeri piccoli.»</em></li>
+        <li><em>«Quali errori faccio di solito in questo caso?»</em></li>
+        <li><em>«Fammi 3 domande per verificare se ho capito.»</em></li>
+      </ul>
+
+      <div class="callout c-stop">
+        <span class="label">Non fare mai questo</span>
+        <p>Non chiedere all'LLM <strong>di fare i calcoli al posto tuo</strong> e non copiare
+        i risultati senza verificarli. Chiedi il <em>procedimento</em>, poi esegui tu in Excel
+        o in Colab. È lì che si impara.</p>
+      </div>
+    </section>
+
+    <!-- ---------- 7 ---------- -->
+    <section id="errori">
+      <h2><span class="num">7</span> I cinque errori più comuni</h2>
+
+      <ol class="steps">
+        <li><strong>Innamorarsi della risposta.</strong> Trovare il numero che conferma la
+        propria idea e fermarsi lì. Prova sempre a cercare il dato che ti smentisce.</li>
+
+        <li><strong>Confondere correlazione e causa.</strong> Le vendite di gelato e le
+        scottature solari crescono insieme, ma il gelato non provoca scottature: è l'estate.</li>
+
+        <li><strong>Guardare la media e ignorare la distribuzione.</strong> «Incasso medio 40 €»
+        può voler dire "tutti 40 €" oppure "metà 5 € e metà 75 €". Sono due mondi diversi.</li>
+
+        <li><strong>Dimenticare le celle vuote.</strong> Un dato mancante può far sparire intere
+        righe dai calcoli senza che tu te ne accorga.</li>
+
+        <li><strong>Non salvare il procedimento.</strong> Se tra un mese ti chiedono "come
+        l'hai calcolato?", devi poterlo rifare. Colab serve esattamente a questo.</li>
+      </ol>
+
+      <div class="callout c-warn">
+        <span class="label">Test rapido</span>
+        <p>Chiedi all'LLM: <em>«Dammi un esempio di due variabili correlate che non hanno
+        nessun rapporto di causa-effetto, adatto a studenti delle superiori.»</em> Poi
+        discutine in classe.</p>
+      </div>
+    </section>
+
+    <!-- ---------- 8 ---------- -->
+    <section id="glossario">
+      <h2><span class="num">8</span> Glossario minimo</h2>
+      <p>Dieci parole che sentirai continuamente. Imparale e il resto diventa molto più facile.</p>
+
+      <dl class="gloss">
+        <div><dt>Dataset</dt><dd>Una tabella di dati organizzata in righe e colonne.</dd></div>
+        <div><dt>Riga (record)</dt><dd>Una singola osservazione: una vendita, uno studente, un giorno.</dd></div>
+        <div><dt>Colonna (campo)</dt><dd>Una caratteristica misurata su tutte le osservazioni.</dd></div>
+        <div><dt>Variabile numerica</dt><dd>Una colonna con numeri su cui puoi fare calcoli.</dd></div>
+        <div><dt>Variabile categorica</dt><dd>Una colonna con etichette: gusti, città, colori.</dd></div>
+        <div><dt>CSV</dt><dd>Il formato di file più semplice per i dati: testo separato da virgole.</dd></div>
+        <div><dt>Media</dt><dd>La somma diviso il numero di valori. Sensibile ai valori estremi.</dd></div>
+        <div><dt>Mediana</dt><dd>Il valore centrale. Più robusta della media quando ci sono valori anomali.</dd></div>
+        <div><dt>Filtro</dt><dd>Mostrare solo le righe che soddisfano una condizione.</dd></div>
+        <div><dt>Pivot</dt><dd>Una tabella riassuntiva che incrocia due colonne e calcola totali.</dd></div>
+        <div><dt>Libreria</dt><dd>Un pacchetto di codice già pronto. <code class="inline">pandas</code> è quella per i dati.</dd></div>
+        <div><dt>Notebook</dt><dd>Un documento fatto di celle di codice, come in Colab.</dd></div>
+      </dl>
+    </section>
+
+    <!-- ---------- 9 ---------- -->
+    <section id="verifica">
+      <h2><span class="num">9</span> Verifica finale: ce l'hai fatta?</h2>
+      <p>Spunta le caselle solo quando sei davvero sicuro. Se ne manca qualcuna, torna alla
+      sezione corrispondente o chiedi all'LLM.</p>
+
+      <ul class="check">
+        <li><label><input type="checkbox"><span>So spiegare con parole mie la differenza tra riga e colonna.</span></label></li>
+        <li><label><input type="checkbox"><span>So scrivere in Excel una formula <code class="inline">SOMMA.SE</code> con la sintassi corretta.</span></label></li>
+        <li><label><input type="checkbox"><span>Ho aperto Google Colab e ho eseguito almeno una cella di codice.</span></label></li>
+        <li><label><input type="checkbox"><span>So che cosa fa <code class="inline">df.groupby(...).sum()</code> anche se non saprei scriverlo da solo.</span></label></li>
+        <li><label><input type="checkbox"><span>Ho prodotto un grafico a partire dai miei dati.</span></label></li>
+        <li><label><input type="checkbox"><span>Ho scritto una conclusione in una frase comprensibile a chiunque.</span></label></li>
+        <li><label><input type="checkbox"><span>Ho usato l'LLM per capire un errore, non per evitarlo.</span></label></li>
+        <li><label><input type="checkbox"><span>So perché non bisogna fidarsi ciecamente dei calcoli fatti da un LLM.</span></label></li>
+      </ul>
+
+      <div class="callout c-tip">
+        <span class="label">Compito per casa</span>
+        <p>Scegli un dataset che ti riguarda davvero: i tuoi tempi di studio, le spese del mese,
+        i risultati sportivi della tua squadra. Poni una domanda, rispondi in Excel, poi rifai
+        lo stesso calcolo in Colab. Porta in classe la conclusione in una frase.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <p><strong>Analisi dei dati: il primo passo</strong> — materiale didattico per classi di principianti.</p>
+  <p>LLM per capire · Excel per toccare · Colab per automatizzare · Tu per decidere.</p>
+</footer>
+
+<script>
+  // ---- Pulsante "Copia" per ogni blocco di codice ----
+  document.querySelectorAll("pre").forEach(function (pre) {
+    const btn = document.createElement("button");
+    btn.className = "copy-btn";
+    btn.type = "button";
+    btn.textContent = "Copia";
+    btn.addEventListener("click", function () {
+      const testo = pre.querySelector("code").innerText;
+      const fatto = function () {
+        btn.textContent = "Copiato ✓";
+        setTimeout(function () { btn.textContent = "Copia"; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(testo).then(fatto).catch(function () {
+          btn.textContent = "Errore";
+          setTimeout(function () { btn.textContent = "Copia"; }, 1500);
+        });
+      } else {
+        // Ripiego per browser vecchi o contesti non sicuri
+        const ta = document.createElement("textarea");
+        ta.value = testo;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); fatto(); } catch (e) { btn.textContent = "Errore"; }
+        document.body.removeChild(ta);
+      }
+    });
+    pre.appendChild(btn);
+  });
+
+  // ---- Evidenzia la voce di indice della sezione visibile ----
+  const links = Array.from(document.querySelectorAll("nav.toc a"));
+  const sezioni = links
+    .map(function (a) { return document.querySelector(a.getAttribute("href")); })
+    .filter(Boolean);
+
+  if ("IntersectionObserver" in window && sezioni.length) {
+    const obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          links.forEach(function (a) { a.classList.remove("active"); });
+          const attivo = links.find(function (a) {
+            return a.getAttribute("href") === "#" + entry.target.id;
+          });
+          if (attivo) attivo.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-90px 0px -70% 0px", threshold: 0 });
+
+    sezioni.forEach(function (s) { obs.observe(s); });
+  }
+</script>
+
+</body>
+</html>
